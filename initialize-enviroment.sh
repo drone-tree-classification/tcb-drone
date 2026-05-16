@@ -93,6 +93,10 @@ if [[ ${IS_INSTALLED} -eq 0 ]]; then
     fi
 fi
 
+#check if these already exist, if not create them.
+mkdir -p Downloads
+mkdir -p Models
+
 # If the training set is not already downloaded, download it  
 for t in ${TRAINING_SET[@]}; do
     if [ ! -f ${t} ] && [ ! -d ${t} ]; then
