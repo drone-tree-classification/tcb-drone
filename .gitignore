@@ -14,3 +14,5 @@ streetview-images/
 numqueries.txt
 __pycache__
 *.tmp
+Downlaods/
+Models/

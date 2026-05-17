@@ -48,6 +48,7 @@ fi
 
 # Attempt to download the file 
 wget ${URL_PREFIX}${1} 2> /dev/null 
+mv ${1} Downloads/${1}
 
 ERROR=$?
 

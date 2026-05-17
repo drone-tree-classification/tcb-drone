@@ -12,12 +12,12 @@ PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 print(tf.__version__)
 
 TrainingSetPathList=[
-      "RillitoPark"
-    , "CherryAvePark"
+      "Downloads/RillitoPark"
+    , "Downloads/CherryAvePark"
 ]
 
-checkpoint_path = "TreeIdentifyTensorFlowModelCropped.keras"
-indexRecordNew="classes-cropped.txt.tmp"
+checkpoint_path = "Models/TreeIdentifyTensorFlowModelCropped.keras"
+indexRecordNew="Models/classes-cropped.txt.tmp"
 trainImageHeight=500
 trainImageWidth=500
 

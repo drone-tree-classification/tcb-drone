@@ -59,7 +59,7 @@ ln -sf ${LATEST_CLASSES_FILE} ${CLASSES_FILE}
 for i in "${VALIDATION_SET[@]}"
 do
     DIRNAME=$(basename -s .tar.gz ${i})
-    if [ ! -d "${DIRNAME}" ]; then
+    if [ ! -d "Downloads/${DIRNAME}" ]; then
         # Download the file and untar it 
         ${SCRIPT_DIR}/download-file-from-space.sh ${i}
         ERROR=$?
@@ -69,7 +69,7 @@ do
             exit 1
         fi
         
-        tar -xzvf ${i}
+        tar -xzvf Downloads/${i}
     fi
 done
 
