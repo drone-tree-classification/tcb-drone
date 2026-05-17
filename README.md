@@ -59,8 +59,36 @@ Note: If a randomly generated coordinate does not have available streetview data
 
 - libs/ Contains python modules that are imported by other projects
 - unit_test/ Contains self contained tests on project functions 
+- uml/ contains uml diagrams 
+
+## UML Diagrams
+These UML diagrams document the system. They were created with umlet diagramming tool.
+
+### Use Case Diagram
+![Use Case Diagram](./uml/tcb_drone_usecase_diagram.svg)
+
+### Provide tagged data sequence diagram
+![Provide tagged data sequence diagram](./uml/tcb_drone_provide_tagged_data_sequence_diagram.svg)
+
+### Update model sequence diagram
+![Update model sequence diagram](./uml/tcb_drone_update_model_sequence_diagram.svg)
+
+### Train model sequence diagram
+![Train model sequence diagram](./uml/tcb_drone_train_model_sequence_diagram.svg)
+
+### Validate model sequence diagram
+![Validate model sequence diagram](./uml/tcb_drone_validate_model_sequence_diagram.svg)
+
+### Run model sequence diagram
+![Execute model sequence diagram](./uml/tcb_drone_execute_model_sequence_diagram.svg)
+
 
 # Project Progress and Tracking
 A [Trello Board](https://trello.com/b/RLBbTfDf/tcb-drone-survey) is being used
 for project progress and task tracking.
 
+# Labelling Images
+The training data for this project is labelled using the python module [LabelImg](https://pypi.org/project/labelImg/). LabelImg allows three different annotation types; we are using the PASCAL VOC format. ![Example labelled drone image](https://tcb-drone.sfo3.digitaloceanspaces.com/LabellingExample.jpg)
+
+# Extracting Drone Flight Logs
+While it is simple to extract video or images the drone produces using an SDA card, extracting the flight logs is less straightforward. The path we have used requires iTunes as an iPhone is used as the drone controller during flight. The images below indicate the steps needed to extract the logs.  ![Step 1 in iTunes](https://tcb-drone.sfo3.digitaloceanspaces.com/iTunes1.png) ![Step 2 in iTunes](https://tcb-drone.sfo3.digitaloceanspaces.com/iTunes2.png)

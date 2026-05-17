@@ -31,8 +31,8 @@ def runModel(model, inputLine, verbose=0):
     
     if len(splitline) >= 5:
         x=int(splitline[1])
-        width=int(splitline[3])
         y=int(splitline[2])
+        width=int(splitline[3])
         height=int(splitline[4])
     
     file_path = Path(inputImage)
