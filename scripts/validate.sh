@@ -18,8 +18,8 @@ declare -a VALIDATION_SET=(
 
 readonly SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # Have to use the python version that is pointed to by the symbolic link, cannot resolve to the base python version
-readonly PYTHON_INTERPRETER=${SCRIPT_DIR}/tensorflow/bin/python
-readonly HAS_PYTHON=$(ls ${PYTHON_INTERPRETER} 2> /dev/null | wc -l) 
+readonly PYTHON_INTERPRETER=${SCRIPT_DIR}/../tensorflow/bin/python
+readonly HAS_PYTHON=$(ls "${PYTHON_INTERPRETER}" 2> /dev/null | wc -l) 
 
 readonly KERAS_FILE=TreeIdentifyTensorFlowModelCropped.keras
 readonly CLASSES_FILE=classes-cropped.txt.tmp
@@ -31,7 +31,7 @@ if [ ${HAS_PYTHON} -eq 0 ]; then
 fi
 
 if [ ! -f ${LATEST_KERAS_FILE} ]; then
-    ${SCRIPT_DIR}/download-file-from-space.sh ${LATEST_KERAS_FILE}
+    "${SCRIPT_DIR}"/download-file-from-space.sh ${LATEST_KERAS_FILE}
     ERROR=$?
 
     if [ ${ERROR} -ne 0 ]; then 
@@ -41,7 +41,7 @@ if [ ! -f ${LATEST_KERAS_FILE} ]; then
 fi
 
 if [ ! -f ${LATEST_CLASSES_FILE} ]; then
-    ${SCRIPT_DIR}/download-file-from-space.sh ${LATEST_CLASSES_FILE}
+    "${SCRIPT_DIR}"/download-file-from-space.sh ${LATEST_CLASSES_FILE}
     ERROR=$?
 
     if [ ${ERROR} -ne 0 ]; then 
@@ -61,7 +61,7 @@ do
     DIRNAME=$(basename -s .tar.gz ${i})
     if [ ! -d "Downloads/${DIRNAME}" ]; then
         # Download the file and untar it 
-        ${SCRIPT_DIR}/download-file-from-space.sh ${i}
+        "${SCRIPT_DIR}"/download-file-from-space.sh ${i}
         ERROR=$?
 
         if [ ${ERROR} -ne 0 ]; then 
@@ -78,8 +78,8 @@ ACCUMULATED_DIRS=""
 for i in "${VALIDATION_SET[@]}"
 do
     DIRNAME=$(basename -s .tar.gz ${i})
-    ACCUMULATED_DIRS="${ACCUMULATED_DIRS} ${DIRNAME}"
+    ACCUMULATED_DIRS="${ACCUMULATED_DIRS} "${SCRIPT_DIR}/../Downloads/"${DIRNAME}"
 done
 
-time ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/harvest-images.py ${ACCUMULATED_DIRS} | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/tensor-run-crop.py | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/count-matches.py ${CLASSES_FILE}
+time "${PYTHON_INTERPRETER}" "${SCRIPT_DIR}"/harvest-images.py "${ACCUMULATED_DIRS}" | "${PYTHON_INTERPRETER}" "${SCRIPT_DIR}"/tensor-run-crop.py | "${PYTHON_INTERPRETER}" "${SCRIPT_DIR}"/count-matches.py "${SCRIPT_DIR}"/../Models/"${CLASSES_FILE}"
 

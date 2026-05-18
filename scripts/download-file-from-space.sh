@@ -9,7 +9,7 @@ readonly URL_PREFIX="https://tcb-drone.sfo3.digitaloceanspaces.com/"
 FORCE=0
 USER_RESPONSE='y'
 readonly SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-readonly PYTHON_INTERPRETER=$(realpath ${SCRIPT_DIR}/tensorflow/bin/python)
+readonly PYTHON_INTERPRETER=$(realpath "${SCRIPT_DIR}/../tensorflow/bin/python")
 # Check for the presense of utilities 
 readonly HAS_PERROR=$(which perror | wc -l)
 readonly HAS_WGET=$(which wget | wc -l)
@@ -83,7 +83,7 @@ if [ ${ERROR} -eq 8 ]; then
     fi
     
     set -o pipefail
-    names=$(${PYTHON_INTERPRETER} ${SCRIPT_DIR}/list-files-in-space.py -n 2> /dev/null) 
+    names=$("${PYTHON_INTERPRETER}" "${SCRIPT_DIR}"/list-files-in-space.py -n 2> /dev/null) 
     PYTHON_ERROR=$?
     numFilesInDir=$(echo "$names" | grep "${thestring}" | wc -l)
     if [ ${numFilesInDir} -gt 0 ]; then
