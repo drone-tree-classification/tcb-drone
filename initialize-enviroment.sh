@@ -82,6 +82,7 @@ if [[ ${IS_INSTALLED} -eq 0 ]]; then
     pip install botocore 
     pip install boto3
     pip install labelImg
+    pip install matplotlib
     
     # Verify installation 
     check_tf_installed
