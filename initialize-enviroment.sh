@@ -81,6 +81,7 @@ if [[ ${IS_INSTALLED} -eq 0 ]]; then
     pip install pyyaml h5py  # Required to save models in HDF5 format
     pip install botocore 
     pip install boto3
+    pip install labelImg
     pip install matplotlib
     
     # Verify installation 

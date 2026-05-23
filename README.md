@@ -88,7 +88,23 @@ A [Trello Board](https://trello.com/b/RLBbTfDf/tcb-drone-survey) is being used
 for project progress and task tracking.
 
 # Labelling Images
-The training data for this project is labelled using the python module [LabelImg](https://pypi.org/project/labelImg/). LabelImg allows three different annotation types; we are using the PASCAL VOC format. ![Example labelled drone image](https://tcb-drone.sfo3.digitaloceanspaces.com/LabellingExample.jpg)
+The training data for this project is labelled using the python module [LabelImg](https://pypi.org/project/labelImg/). LabelImg allows three different annotation types; we are using the PASCAL VOC format. ![Example labelled drone image](https://tcb-drone.sfo3.digitaloceanspaces.com/LabellingExample.jpg) Running initialize-environment.sh installs this module. You can run it with
+```
+python labelImg.py
+``` 
+in the tensorflow/lib/python3.12/site-packages/labelImg directory. A known problem exists between Python/PyQt and Python versions 3.10 and above; the QPainter class expects integers to its drawLine function, while the tkinter canvas class tries to give it floats. This issue can be fixed by replacing the lines 
+```
+p.drawLine(self.prev_point.x(), 0, self.prev_point.x(), self.pixmap.height())
+p.drawLine(0, self.prev_point.y(), self.pixmap.width(), self.prev_point.y())
+```
+
+with the lines 
+
+```
+p.drawLine(int(self.prev_point.x()), 0, int(self.prev_point.x()), int(self.pixmap.height()))
+p.drawLine(0, int(self.prev_point.y()), int(self.pixmap.width()), int(self.prev_point.y()))
+```
+in the file tensorflow/lib/python3.12/site-packages/libs/canvas.py
 
 # Extracting Drone Flight Logs
 While it is simple to extract video or images the drone produces using an SDA card, extracting the flight logs is less straightforward. The path we have used requires iTunes as an iPhone is used as the drone controller during flight. The images below indicate the steps needed to extract the logs.  ![Step 1 in iTunes](https://tcb-drone.sfo3.digitaloceanspaces.com/iTunes1.png) ![Step 2 in iTunes](https://tcb-drone.sfo3.digitaloceanspaces.com/iTunes2.png)
