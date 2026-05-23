@@ -41,6 +41,15 @@ Files can be deleted with
 
 User is required to provide confirmation before completing all file deletions.
 
+## Training 
+Developers can train a bounding box training program by running:
+
+```
+./train-object-localization.py
+```
+
+This will produce a custom_tree_detector.keras file.
+
 ## Validate
 The validate script compares the output of the keras model and the captions on 
 the pictures. It can be run with 
