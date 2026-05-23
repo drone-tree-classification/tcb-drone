@@ -1,5 +1,4 @@
 #!./tensorflow/bin/python
-
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from tensorflow.keras.models import Model, load_model
@@ -16,6 +15,10 @@ trainImageHeight=500
 trainImageWidth=500
 indexRecord="classes-cropped.txt.tmp"
 classesArray = []
+
+test_labels = []
+test_images = []
+predictions = []
 
 def runModel(model, inputLine, verbose=0):
     splitline = inputLine.split()
@@ -41,12 +44,15 @@ def runModel(model, inputLine, verbose=0):
         if width > 0 and height > 0:
             im = im[y:(y+height), x:(x+width)] 
         im = cv2.resize(im, (trainImageHeight, trainImageWidth)) 
-
+        test_images.append(im)
+        test_labels.append(str(splitline[5]).replace('\n',''))
+    
         image_in_array = np.vstack([[im]])
 
         # Evaluate the model
         result = model.predict(image_in_array[:1], verbose=0)
-        print(PROGRAM_NAME + "Result: " + str(result), file=sys.stderr)
+        predictions.append(result[0])
+        print(PROGRAM_NAME + " Result: " + str(result), file=sys.stderr)
 
         index=0
         indexOfHighestValue=-1
@@ -76,8 +82,9 @@ def runModel(model, inputLine, verbose=0):
     return 0
 
 parser = argparse.ArgumentParser()
-parser.add_argument('filenames', nargs='*') 
+parser.add_argument('filenames', nargs='*')
 parser.add_argument('--verbose', '-v', action='count', default=0)
+parser.add_argument('--visual', action='store_true', help='Enable visualization of results.')
 args = parser.parse_args()
 
 TrainingSetPath="Labels"
@@ -122,5 +129,29 @@ if len(args.filenames) == 0:
 else:
     for inputImage in args.filenames:
         runModel(model, inputImage, args.verbose)
+
+if args.visual:
+
+    from libs.plotFuncs import *
+
+    num_rows = 5
+    num_cols = 3
+    numskip = 0
+    num_images = num_rows*num_cols
+    plt.figure(figsize=(2*2*num_cols, 2*num_rows))
+    i = 0
+    while (i < num_images):
+        try:
+            classesArray.index(test_labels[i + numskip])
+        except ValueError:
+            numskip += 1
+            continue
+        plt.subplot(num_rows, 2*num_cols, 2*i+1)
+        plot_image(i + numskip, test_labels, test_images, classesArray, predictions_array=predictions[i + numskip])
+        plt.subplot(num_rows, 2*num_cols, 2*i+2)
+        plot_value_array(i + numskip, predictions[i + numskip], test_labels, classesArray)
+        i+=1
+    plt.tight_layout()
+    plt.show()
 
         
