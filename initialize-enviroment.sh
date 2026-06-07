@@ -112,5 +112,5 @@ for t in ${TRAINING_SET[@]}; do
     
 done
 
-
-
+#add scripts directory to PATH
+PATH=$(pwd)/scripts:$PATH
