@@ -22,20 +22,20 @@ if [ ${HAS_WGET} -eq 0 ]; then
     exit 1
 fi
 
-if [ $# -lt 1 ] || [ "$1" == "-f" ]
+if [ $# -lt 1 ] || [ "$1" == "-f" ];
 then 
     >&2 printf "${0}: Error: No file specified. Please provide name of file to download.\n"
     exit 1
 fi
 
 # Check for presense of force flag 
-if [ $# -ge 2 ] && [ "$2" == "-f" ] 
+if [ $# -ge 2 ] && [ "$2" == "-f" ]; 
 then
     FORCE=1
 fi
 
 # If the file exists and the force flag is not set, ask the user if they want to continue download 
-if [ -f $1 ] && [ ${FORCE} -eq 0 ] 
+if [ -f $1 ] && [ ${FORCE} -eq 0 ]; 
 then
    >&2 printf "${0}: Query: File exists, continue? (y/N): "
    read USER_RESPONSE
@@ -48,8 +48,12 @@ fi
 
 # Attempt to download the file 
 wget ${URL_PREFIX}${1} 2> /dev/null 
-mv ${1} Downloads/${1}
 
+if [[ "${1}" == *.tmp ]] || [[ "${1}" == *.keras ]] ; then
+	mv ${1} Models/${1}
+else
+	mv ${1} Downloads/${1}
+fi
 ERROR=$?
 
 # If download was unsuccessful

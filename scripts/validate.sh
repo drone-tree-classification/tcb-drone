@@ -17,6 +17,7 @@ declare -a VALIDATION_SET=(
                 )
 
 readonly SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+PROJECT_ROOT=$(dirname "$SCRIPT_DIR")
 # Have to use the python version that is pointed to by the symbolic link, cannot resolve to the base python version
 readonly PYTHON_INTERPRETER=${SCRIPT_DIR}/../tensorflow/bin/python
 readonly HAS_PYTHON=$(ls "${PYTHON_INTERPRETER}" 2> /dev/null | wc -l) 
@@ -52,8 +53,8 @@ fi
 
 # Make the symbolic link from the normally named keras file to the new
 # keras file  
-ln -sf ${LATEST_KERAS_FILE} ${KERAS_FILE} 
-ln -sf ${LATEST_CLASSES_FILE} ${CLASSES_FILE} 
+ln -sf ${PROJECT_ROOT}/Models/${LATEST_KERAS_FILE} ${KERAS_FILE} 
+ln -sf ${PROJECT_ROOT}/Models/${LATEST_CLASSES_FILE} ${CLASSES_FILE} 
 
 # Download the validation set if the file does not exist 
 for i in "${VALIDATION_SET[@]}"
@@ -68,8 +69,9 @@ do
             >&2 printf "${0}: Error: Could not download file: %s\n" ${i}
             exit 1
         fi
-        
+        cd ${SCRIPT_DIR}/../Downloads
         tar -xzvf Downloads/${i}
+	cd ../${SCRIPT_DIR}
     fi
 done
 
@@ -78,8 +80,12 @@ ACCUMULATED_DIRS=""
 for i in "${VALIDATION_SET[@]}"
 do
     DIRNAME=$(basename -s .tar.gz ${i})
-    ACCUMULATED_DIRS="${ACCUMULATED_DIRS} "${SCRIPT_DIR}/../Downloads/"${DIRNAME}"
+    ACCUMULATED_DIRS="${ACCUMULATED_DIRS} ${PROJECT_ROOT}/Downloads/${DIRNAME}"
 done
 
-time "${PYTHON_INTERPRETER}" "${SCRIPT_DIR}"/harvest-images.py "${ACCUMULATED_DIRS}" | "${PYTHON_INTERPRETER}" "${SCRIPT_DIR}"/tensor-run-crop.py | "${PYTHON_INTERPRETER}" "${SCRIPT_DIR}"/count-matches.py "${SCRIPT_DIR}"/../Models/"${CLASSES_FILE}"
+export PYTHONPATH="$PROJECT_ROOT/libs:$PYTHONPATH"
+
+echo ${ACCUMULATED_DIRS}
+
+time ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/harvest-images.py ${ACCUMULATED_DIRS} | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/tensor-run-crop.py | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/count-matches.py ${PROJECT_ROOT}/${CLASSES_FILE}
 

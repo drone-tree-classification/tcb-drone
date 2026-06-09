@@ -5,15 +5,15 @@ tcb-drone measures tree health from aerial photographs from drone flyovers of Tu
 This git project implements neural networks and machine learning to identify trees and assess tree health. This project leverages TensorFlow to implement machine learning algorithms to assess tree health based on aerial photographs of trees.
 
 # Setup
-Once this repo is cloned, developers may setup their development enviroment by running
+Once this repo is cloned, developers may setup their development environment by running
 ```
-./initialize-enviroment.sh
+source initialize-enviroment.sh
 ```
 which will install TensorFlow locally in the development sandbox.
 
 If the developer wishes to employ a GPU to accelerate training runtimes, and is on a system that uses an nVidia GPU and has CUDA installed, the developer may setup their development enviroment by running:
 ```
-./initialize-enviroment.sh GPU
+source initialize-enviroment.sh GPU
 ```
 
 ## Uploading new data

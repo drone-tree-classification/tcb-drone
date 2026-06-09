@@ -100,12 +100,14 @@ mkdir -p Models
 
 # If the training set is not already downloaded, download it  
 for t in ${TRAINING_SET[@]}; do
-    if [ ! -f ${t} ] && [ ! -d ${t} ]; then
+    if [ ! -f Downloads/${t} ] && [ ! -d Downloads/${t} ]; then
         # Get the initial training set 
         wget https://tcb-drone.sfo3.digitaloceanspaces.com/${t}
-
-        # unzip the training set 
-        tar -xf ${t}
+	mv ${t} Downloads/${t}
+        # unzip the training set
+	cd Downloads	
+        tar -xf Downloads/${t}
+	cd ..
     else
         echo "${0}: info: ${t} Already Downloaded."
     fi
@@ -113,4 +115,5 @@ for t in ${TRAINING_SET[@]}; do
 done
 
 #add scripts directory to PATH
-PATH=$(pwd)/scripts:$PATH
+export PATH=$(pwd)/scripts:$PATH
+export PYTHONPATH=$(pwd)/libs:$PYTHONPATH

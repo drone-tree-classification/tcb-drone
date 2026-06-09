@@ -6,7 +6,7 @@
 
 import sys
 from os import walk
-from libs.parse_annotation import *
+from parse_annotation import *
 
 textFileList = []
 jpgFileList = [] 

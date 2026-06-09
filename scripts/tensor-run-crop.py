@@ -14,7 +14,8 @@ PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 
 trainImageHeight=500
 trainImageWidth=500
-indexRecord="Models/classes-cropped.txt.tmp"
+current_dir = os.getcwd()
+indexRecord=current_dir + "/classes-cropped.txt.tmp"
 classesArray = []
 
 def runModel(model, inputLine, verbose=0):
@@ -81,10 +82,11 @@ parser.add_argument('--verbose', '-v', action='count', default=0)
 args = parser.parse_args()
 
 TrainingSetPath="Labels"
-checkpoint_path = "Models/TreeIdentifyTensorFlowModelCropped.keras"
+checkpoint_path = current_dir + "/TreeIdentifyTensorFlowModelCropped.keras"
 
 print(PROGRAM_NAME + ": info: version: " + tf.__version__, file=sys.stderr)
 
+print(indexRecord, file=sys.stderr)
 inputImages = []
 
 # Read in the classes file, which contains a record of the trees we trained on
