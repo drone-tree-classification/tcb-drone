@@ -59,7 +59,7 @@ else
     tf_ver="tensorflow"
     check_tf_installed () {
        # Verify installation 
-        IS_INSTALLED=$(python3 -c "import tensorflow as tf; print(tf.__version__)"  | grep -Po "[0-9]+\.[0-9]+\.[0-9]+"  | wc -l)
+        IS_INSTALLED=$(python3 -c "import tensorflow as tf; import keras_cv; print(tf.__version__)"  | grep -Po "[0-9]+\.[0-9]+\.[0-9]+"  | wc -l)
     }
 fi
 
@@ -82,6 +82,7 @@ if [[ ${IS_INSTALLED} -eq 0 ]]; then
     pip install botocore 
     pip install boto3
     pip install matplotlib
+    pip install keras-cv
     
     # Verify installation 
     check_tf_installed
