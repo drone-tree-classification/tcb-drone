@@ -83,6 +83,7 @@ if [[ ${IS_INSTALLED} -eq 0 ]]; then
     pip install boto3
     pip install matplotlib
     pip install keras-cv
+    pip install matplotlib==3.2.2
     
     # Verify installation 
     check_tf_installed
