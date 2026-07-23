@@ -29,6 +29,19 @@ PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 if tf is not None:
     print(tf.__version__)
 
+    # Configure GPU to use memory dynamically if available
+    gpus = tf.config.list_physical_devices('GPU')
+    if gpus:
+        try:
+            for gpu in gpus:
+                tf.config.experimental.set_memory_growth(gpu, True)
+            print(f"{PROGRAM_NAME}: Info: Found {len(gpus)} GPU(s). Enabled dynamic memory growth.", file=sys.stderr)
+        except RuntimeError as e:
+            # Memory growth must be set before GPUs have been initialized
+            print(f"{PROGRAM_NAME}: Warning: GPU configuration failed: {e}", file=sys.stderr)
+    else:
+        print(f"{PROGRAM_NAME}: Info: No GPU detected. Training will run on CPU.", file=sys.stderr)
+
 parser = argparse.ArgumentParser(description='Fine-tune an object detection model on PASCAL VOC labelled images.')
 parser.add_argument('-m', '--model', type=str, required=True, help='Path to the input object detection model (.keras file).')
 parser.add_argument('-d', '--datasets', type=str, nargs='+', required=True, help='Paths to the directories containing the dataset.')
