@@ -3,6 +3,7 @@
 import os
 import sys
 import argparse
+import urllib.parse
 import xml.etree.ElementTree as ET
 from os import walk
 
@@ -23,6 +24,7 @@ except ImportError:
 
 if tf is not None:
     from tensorflow.keras.models import load_model
+    import tensorflow_hub as hub # Sometimes off-the-shelf models are best loaded via hub, but we can also use keras get_file
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 
@@ -43,7 +45,7 @@ if tf is not None:
         print(f"{PROGRAM_NAME}: Info: No GPU detected. Training will run on CPU.", file=sys.stderr)
 
 parser = argparse.ArgumentParser(description='Fine-tune an object detection model on PASCAL VOC labelled images.')
-parser.add_argument('-m', '--model', type=str, required=True, help='Path to the input object detection model (.keras file).')
+parser.add_argument('-m', '--model', type=str, required=True, help='Path or URL to the input object detection model (SavedModel dir, .h5, .keras, or a downloadable archive URL).')
 parser.add_argument('-d', '--datasets', type=str, nargs='+', required=True, help='Paths to the directories containing the dataset.')
 parser.add_argument('-o', '--output', type=str, default='FineTunedODModel.keras', help='Path to save the fine-tuned model.')
 parser.add_argument('-e', '--epochs', type=int, default=10, help='Number of epochs to train for.')
@@ -56,11 +58,53 @@ if tf is None or cv2 is None or np is None:
     print("Required libraries not found. Ensure tensorflow, opencv, and numpy are installed.", file=sys.stderr)
     sys.exit(1)
 
+
+def get_model_path(model_arg):
+    # Check if URL
+    parsed = urllib.parse.urlparse(model_arg)
+    if parsed.scheme in ('http', 'https'):
+        print(f"Downloading model from {model_arg}...")
+        fname = os.path.basename(parsed.path)
+        if not fname:
+            fname = "downloaded_model"
+
+        extract = False
+        if fname.endswith(('.zip', '.tar.gz', '.tgz', '.tar')):
+            extract = True
+
+        download_path = tf.keras.utils.get_file(
+            fname=fname,
+            origin=model_arg,
+            extract=extract,
+            cache_subdir='models'
+        )
+
+        if extract:
+            # If extracted, the actual model might be a subdirectory (SavedModel format)
+            # Find the directory containing saved_model.pb
+            cache_dir = os.path.dirname(download_path)
+            for root, dirs, files in os.walk(cache_dir):
+                if 'saved_model.pb' in files:
+                    return root
+                # Alternatively look for a .keras or .h5 inside
+                for f in files:
+                    if f.endswith(('.keras', '.h5')):
+                        return os.path.join(root, f)
+
+            # Fallback to the cache directory if nothing specific found (might just be a flat dir of weights)
+            return cache_dir
+        else:
+            return download_path
+
+    return model_arg
+
+model_path = get_model_path(args.model)
+
 # Load existing model
 try:
-    print(f"Loading model from {args.model}")
+    print(f"Loading model from {model_path}")
     # Compile false to prevent requiring custom loss functions on load
-    model = load_model(args.model, compile=False)
+    model = load_model(model_path, compile=False)
 except Exception as e:
     print(f"Error loading model: {e}", file=sys.stderr)
     sys.exit(1)
