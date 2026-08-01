@@ -146,30 +146,33 @@ def weighted_od_loss(y_true, y_pred):
     """
     Weighted Loss for Grid-Based Object Detection.
     y_true / y_pred shape: (batch, GRID_SIZE, GRID_SIZE, 5)
-    Index 0: object confidence
-    Index 1-2: dx, dy (cell offsets)
-    Index 3-4: norm_w, norm_h (box dimensions)
     """
-    obj_mask = y_true[..., 0:1]       # Shape: (batch, H, W, 1)
+    obj_mask = y_true[..., 0:1]       # Shape: (batch, 16, 16, 1)
     noobj_mask = 1.0 - obj_mask
 
     # Confidence Loss (Binary Crossentropy)
     bce = tf.keras.losses.BinaryCrossentropy(reduction=tf.keras.losses.Reduction.NONE)
-    conf_loss = bce(y_true[..., 0:1], y_pred[..., 0:1])
+    conf_loss = bce(y_true[..., 0:1], y_pred[..., 0:1])  # Shape becomes (batch, 16, 16)
+    
+    # FIX: Add the trailing dimension back so it matches the masks
+    conf_loss = tf.expand_dims(conf_loss, axis=-1)       # Shape restored to (batch, 16, 16, 1)
 
     # Downweight empty background cells (0.5) vs object cells (5.0)
     weighted_conf_loss = (obj_mask * conf_loss * 5.0) + (noobj_mask * conf_loss * 0.5)
 
     # Box Coordinate Loss (Huber Loss, masked to positive object cells only)
     huber = tf.keras.losses.Huber(reduction=tf.keras.losses.Reduction.NONE)
-    box_loss = huber(y_true[..., 1:5], y_pred[..., 1:5])
+    box_loss = huber(y_true[..., 1:5], y_pred[..., 1:5]) # Shape becomes (batch, 16, 16)
+    
+    # FIX: Add trailing dimension back
+    box_loss = tf.expand_dims(box_loss, axis=-1)         # Shape restored to (batch, 16, 16, 1)
+    
     masked_box_loss = box_loss * obj_mask
 
     total_conf = tf.reduce_mean(tf.reduce_sum(weighted_conf_loss, axis=[1, 2, 3]))
     total_box = tf.reduce_mean(tf.reduce_sum(masked_box_loss, axis=[1, 2, 3]))
 
     return total_conf + (total_box * 5.0)
-
 
 def build_grid_model(img_size=512):
     """Builds ResNet50 with a custom 1x1 Conv Grid Head."""
