@@ -220,7 +220,7 @@ def main():
         output_signature=output_signature
     )
 
-    dataset = dataset.shuffle(buffer_size=100).batch(args.batch_size).prefetch(tf.data.AUTOTUNE)
+    dataset = dataset.shuffle(buffer_size=100).batch(args.batch_size).prefetch(tf.data.AUTOTUNE).repeat()
 
     # Build and Compile Model
     model = build_grid_model(img_size=IMG_SIZE)
@@ -230,10 +230,11 @@ def main():
     )
 
     model.summary()
+    steps_per_epoch = len(matched_pairs) //args.batch_size
 
     # Execute Training
     print("Starting Training...")
-    model.fit(dataset, epochs=args.epochs)
+    model.fit(dataset, epochs=args.epochs, steps_per_epoch = steps_per_epoch)
 
     model.save(args.output)
     print(f"Model successfully saved to {args.output}")
