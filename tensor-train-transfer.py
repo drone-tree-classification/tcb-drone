@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!./tensorflow/bin/python
 
 import os
 import sys
