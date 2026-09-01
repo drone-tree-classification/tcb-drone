@@ -8,7 +8,7 @@
 readonly LATEST_KERAS_FILE=TreeIdentifyTensorFlowModelCropped_v01.keras
 readonly LATEST_CLASSES_FILE=classes-cropped_v01.txt.tmp
 
-# VALIDATION_SET is an array of 
+# VALIDATION_SET is an array of files on the digital ocean bucket 
 declare -a VALIDATION_SET=(
                            "MissionManorPark.tar.gz"
                            "HimmelDrone.tar.gz"
