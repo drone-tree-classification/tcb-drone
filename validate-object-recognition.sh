@@ -1,14 +1,14 @@
 #!/usr/bin/bash
 
-# validate.sh downloads the validation set and compares outputs from the model
-# to annotations in the images.
+# validate-object-recognition.sh downloads the validation set and compares 
+# outputs from the object recognition model to annotations in the images.
 
 # LATEST_KERAS_FILE is the most recent uploaded keras model. This should be 
 # updated in a PR when a new model is released. 
 readonly LATEST_KERAS_FILE=TreeIdentifyTensorFlowModelCropped_v01.keras
 readonly LATEST_CLASSES_FILE=classes-cropped_v01.txt.tmp
 
-# VALIDATION_SET is an array of 
+# VALIDATION_SET is an array of files on the digital ocean bucket 
 declare -a VALIDATION_SET=(
                            "MissionManorPark.tar.gz"
                            "HimmelDrone.tar.gz"
@@ -81,5 +81,5 @@ do
     ACCUMULATED_DIRS="${ACCUMULATED_DIRS} ${DIRNAME}"
 done
 
-time ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/harvest-images.py ${ACCUMULATED_DIRS} | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/tensor-run-crop.py | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/count-matches.py ${CLASSES_FILE}
+time ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/harvest-images.py ${ACCUMULATED_DIRS} | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/object-recognition-run.py | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/count-matches.py ${CLASSES_FILE}
 
