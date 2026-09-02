@@ -31,6 +31,7 @@ declare -a TRAINING_SET=(
                            "Himmel.tar.gz"
                            "Himmel2.tar.gz"
                            "CherryAvePark.tar.gz"
+                           "RillitoPark.tar.gz"
                 )
    
 # Training set dir names maps the tar files to the names that they come out of
@@ -40,6 +41,7 @@ declare -a TRAINING_SET_DIR_NAMES=(
                            "HimmelDrone"
                            "HimmelDrone2"
                            "CherryAvePark"
+                           "RillitoPark"
                 )
 
 # Training set string contains the linearized list of directories 
