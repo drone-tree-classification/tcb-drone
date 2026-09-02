@@ -82,8 +82,10 @@ if [ ${PYTHON_ERROR} -eq 0 ]; then
         ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/upload-file-to-space.py ${LATEST_KERAS_FILE} ${LATEST_KERAS_FILE} 
         PYTHON_ERROR=$?
         if [ ${PYTHON_ERROR} -ne 0 ]; then
-            >&2 printf "${0}: Error: Uploading file, please review log and upload %s manually" ${LATEST_KERAS_FILE}
+            >&2 printf "${0}: Error: Unable to upload file, please review log and upload %s manually" ${LATEST_KERAS_FILE}
         fi
+    else
+        >&2 printf "${0}: Info: User selection was no, please upload %s manually" ${LATEST_KERAS_FILE}
     fi
 fi
 
