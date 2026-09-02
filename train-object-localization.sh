@@ -23,8 +23,7 @@ readonly LATEST_KERAS_FILE=FineTunedResNetOD-${DATE}.keras
 USER_RESPONSE='n'
 
 # Could not find 
-# - CSMGummyDrone or 
-# - RillitoPark 
+# - CSMGummyDrone 
 # in ./list-files-in-space.py
 declare -a TRAINING_SET=(
                            "CSMGummy2.tar.gz"
