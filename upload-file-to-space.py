@@ -6,20 +6,27 @@ import boto3
 import botocore
 import sys
 import json
+from pathlib import Path
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
+PASSWORD_FILE="password.json"
+
+my_file = Path(PASSWORD_FILE)
+if not (my_file.exists() and my_file.is_file()):
+    print(PROGRAM_NAME + ": Error: password.json file is required to upload. Please consult the README.md file.", file=sys.stderr)
+    sys.exit(1)
 
 if len(sys.argv) < 2:
     print(PROGRAM_NAME + ": Error: No file provided: Please provide name of file in input.", file=sys.stderr)
     sys.exit(1)
 
 if len(sys.argv) < 3:
-    print(PROGRAM_NAME + "Warning: No destination file name provided. Defaulting to path as file name.", file=sys.stderr)
+    print(PROGRAM_NAME + ": Warning: No destination file name provided. Defaulting to path as file name.", file=sys.stderr)
     answer = input("Do you want to continue with path name?:[y/n] ")
     if (answer != "y" and answer != "Y"):
         sys.exit(1)
-
-with open("password.json", "r") as file:
+    
+with open(PASSWORD_FILE, "r") as file:
     data = json.load(file)
 
     # Step 2: The new session validates your request and directs it to your Space's specified endpoint using the AWS SDK.

@@ -42,10 +42,10 @@ Files can be deleted with
 User is required to provide confirmation before completing all file deletions.
 
 ## Validate
-The validate script compares the output of the keras model and the captions on 
-the pictures. It can be run with 
+The validate object recognition script compares the output of the keras model 
+and the captions on the pictures. It can be run with 
 ```
-./validate.py
+./validate-object-recognition.sh
 ```
 This will download the latest keras file and validation set and evaluate model
 predictions against human evaluated criteria. 

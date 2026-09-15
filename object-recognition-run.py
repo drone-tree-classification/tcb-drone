@@ -11,8 +11,8 @@ import argparse
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 
-trainImageHeight=500
-trainImageWidth=500
+trainImageHeight=512
+trainImageWidth=512
 indexRecord="classes-cropped.txt.tmp"
 classesArray = []
 
