@@ -22,10 +22,8 @@ readonly LATEST_KERAS_FILE=FineTunedResNetOD-${DATE}.keras
 
 USER_RESPONSE='n'
 
-# Could not find 
-# - CSMGummyDrone 
-# in ./list-files-in-space.py
 declare -a TRAINING_SET=(
+                           "CSMGummy.tar.gz"
                            "CSMGummy2.tar.gz"
                            "Himmel.tar.gz"
                            "Himmel2.tar.gz"
@@ -36,6 +34,7 @@ declare -a TRAINING_SET=(
 # Training set dir names maps the tar files to the names that they come out of
 # storage as.              
 declare -a TRAINING_SET_DIR_NAMES=(
+                           "CSMGummyDrone"
                            "CSMGummy2"
                            "HimmelDrone"
                            "HimmelDrone2"
