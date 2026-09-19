@@ -16,6 +16,44 @@ If the developer wishes to employ a GPU to accelerate training runtimes, and is 
 ./initialize-enviroment.sh GPU
 ```
 
+## Setup using Docker (Recommended for cross-platform portability)
+To avoid portability issues across different Linux OSs or environments, it is recommended to use Docker.
+
+First, ensure you have [Docker](https://docs.docker.com/get-docker/) and optionally [Docker Compose](https://docs.docker.com/compose/install/) installed.
+
+### Using Docker Compose
+You can start the development environment using Docker Compose:
+```bash
+docker-compose up -d
+docker-compose exec tcb-drone bash
+```
+This will start a container with all dependencies installed and mount your current working directory to `/app` inside the container, so any changes you make to the code locally will immediately reflect inside the container.
+
+To stop the environment:
+```bash
+docker-compose down
+```
+
+**GPU Support with Docker Compose**
+If your host system has an NVIDIA GPU and you want to accelerate training, uncomment the `deploy` section in `docker-compose.yml` to enable GPU capabilities. You will need to install the [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html).
+
+### Using standard Docker commands
+To build the image manually:
+```bash
+docker build -t tcb-drone-env .
+```
+
+To run the container interactively with your local files mounted:
+```bash
+docker run -it --rm -v $(pwd):/app tcb-drone-env
+```
+
+**GPU Support with Docker**
+To run with GPU support using standard Docker commands:
+```bash
+docker run -it --rm --gpus all -v $(pwd):/app tcb-drone-env
+```
+
 ## Uploading new data
 First create your `password.json` file in the following format
 ```
