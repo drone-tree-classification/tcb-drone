@@ -123,6 +123,6 @@ else
 fi
 
 # Download the training set 
-download_training_set(${SCRIPT_DIR})
+download_training_set ${SCRIPT_DIR} 
 
 
