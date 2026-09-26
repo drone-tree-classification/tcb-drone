@@ -10,6 +10,8 @@ readonly SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null 
 readonly PYTHON_INTERPRETER=${SCRIPT_DIR}/tensorflow/bin/python
 readonly HAS_PYTHON=$(ls ${PYTHON_INTERPRETER} 2> /dev/null | wc -l) 
 
+source training-set-include.sh
+
 # Test to see if users computer has python installed 
 if [ ${HAS_PYTHON} -eq 0 ]; then 
     >&2 printf "${0}: Error: python not found.\n"
@@ -22,50 +24,7 @@ readonly LATEST_KERAS_FILE=FineTunedResNetOD-${DATE}.keras
 
 USER_RESPONSE='n'
 
-declare -a TRAINING_SET=(
-                           "CSMGummy.tar.gz"
-                           "CSMGummy2.tar.gz"
-                           "Himmel.tar.gz"
-                           "Himmel2.tar.gz"
-                           "CherryAvePark.tar.gz"
-                           "RillitoPark.tar.gz"
-                )
-   
-# Training set dir names maps the tar files to the names that they come out of
-# storage as.              
-declare -a TRAINING_SET_DIR_NAMES=(
-                           "CSMGummyDrone"
-                           "CSMGummy2"
-                           "HimmelDrone"
-                           "HimmelDrone2"
-                           "CherryAvePark"
-                           "RillitoPark"
-                )
-
-# Training set string contains the linearized list of directories 
-TRAINING_SET_STRING=""
-
-# Download the training set if the file does not exist 
-j=0
-for i in "${TRAINING_SET[@]}"
-do
-    DIRNAME=${TRAINING_SET_DIR_NAMES[$j]}
-    TRAINING_SET_STRING="${TRAINING_SET_STRING} ${DIRNAME}"
-    if [ ! -d "${DIRNAME}" ]; then
-        >&2 printf "${0}: Info: Downloading %s ...\n" ${i}
-        # Download the file and untar it 
-        ${SCRIPT_DIR}/download-file-from-space.sh ${i}
-        ERROR=$?
-
-        if [ ${ERROR} -ne 0 ]; then 
-            >&2 printf "${0}: Error: Could not download file: %s\n" ${i}
-            exit 1
-        fi
-        
-        tar -xzvf ${i}
-    fi
-    j=$((j += 1))
-done
+TRAINING_SET_STRING=$(download_training_set "${SCRIPT_DIR}" ) 
 
 echo ${TRAINING_SET_STRING}
 

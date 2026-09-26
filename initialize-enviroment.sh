@@ -12,8 +12,8 @@
 # This script should be run just once, after the repo has been cloned and 
 # before any python scripts are run. 
 
-# Name of the training set file, this may change PR to PR. 
-TRAINING_SET=(Parker.tar.gz RillitoPark CherryPark)
+readonly SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source training-set-include.sh
 
 # List of packages to be installed 
 REQUIRED_PACKAGES=(pip opencv-python pyyaml h5py botocore boto3 labelImg matplotlib)
@@ -24,6 +24,8 @@ PYTHON_MINOR_MIN=10
 # Verify installation 
 IS_INSTALLED=0
 tf_ver=""
+
+
 
 readonly HAS_PYTHON=$(which python3 | wc -l)
 
@@ -120,19 +122,7 @@ else
     exit 1
 fi
 
-# If the training set is not already downloaded, download it  
-for t in ${TRAINING_SET[@]}; do
-    if [ ! -f ${t} ] && [ ! -d ${t} ]; then
-        # Get the initial training set 
-        wget https://tcb-drone.sfo3.digitaloceanspaces.com/${t}
-
-        # unzip the training set 
-        tar -xf ${t}
-    else
-        echo "${0}: info: ${t} Already Downloaded."
-    fi
-    
-done
-
+# Download the training set 
+download_training_set(${SCRIPT_DIR})
 
 

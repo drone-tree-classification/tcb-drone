@@ -14,3 +14,12 @@ streetview-images/
 numqueries.txt
 __pycache__
 *.tmp
+
+# Training set 
+CSMGummy2/
+CSMGummyDrone/
+CherryAvePark/
+CherryPark
+HimmelDrone/
+HimmelDrone2/
+RillitoPark/
