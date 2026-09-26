@@ -6,14 +6,20 @@
 # If the package is not installed, you may install it with the command 
 # sudo apt install python3-venv 
 
+# Run with GPU arg to set up tensorflow with cuda. To download cuda toolkit, reference:
+# https://docs.nvidia.com/cuda/cuda-installation-guide-linux
+
 # This script should be run just once, after the repo has been cloned and 
 # before any python scripts are run. 
 
 # Name of the training set file, this may change PR to PR. 
 TRAINING_SET=(Parker.tar.gz RillitoPark CherryPark)
 
-# Run with GPU arg to set up tensorflow with cuda. To download cuda toolkit, reference:
-# https://docs.nvidia.com/cuda/cuda-installation-guide-linux
+# List of packages to be installed 
+REQUIRED_PACKAGES=(pip opencv-python pyyaml h5py botocore boto3 labelImg matplotlib)
+
+PYTHON_MAJOR_NEEDED=3
+PYTHON_MINOR_MIN=10
 
 # Verify installation 
 IS_INSTALLED=0
@@ -27,8 +33,13 @@ if [ ${HAS_PYTHON} -eq 0 ]; then
     exit 1
 fi
 
-PYTHON_MAJOR_NEEDED=3
-PYTHON_MINOR_MIN=10
+readonly HAS_PIP=$(which pip | wc -l)
+
+if [ ${HAS_PIP} -eq 0 ]; then 
+    >&2 printf "${0}: Error: pip package manager not found.\n"
+    >&2 printf "${0}: Info: please install pip and try again.\n"
+    exit 1
+fi
 
 PYTHON_MAJOR=$(python3 --version | grep -Po '[0-9]+\.[0-9]+' | awk '{split($1,a,".");print a[1]}')
 PYTHON_MINOR=$(python3 --version | grep -Po '[0-9]+\.[0-9]+' | awk '{split($1,a,".");print a[2]}')
@@ -45,7 +56,11 @@ if [ ${PYTHON_MINOR} -lt ${PYTHON_MINOR_MIN} ]; then
     exit 1
 fi
 
+
+# Determine whether to install tensor flow for GPU of CPU depending on user 
+# input. Add the version of tensor flow to the list of REQUIRED_PACKAGES.
 if [[ $1 == "GPU" ]]; then
+    # GPU Installation
     tf_ver="tensorflow[and-cuda]"
     check_tf_installed () {
         # Check that a GPU device is listed
@@ -56,12 +71,14 @@ if [[ $1 == "GPU" ]]; then
         fi
     }
 else
+    # CPU Installation 
     tf_ver="tensorflow"
     check_tf_installed () {
        # Verify installation 
         IS_INSTALLED=$(python3 -c "import tensorflow as tf; print(tf.__version__)"  | grep -Po "[0-9]+\.[0-9]+\.[0-9]+"  | wc -l)
     }
 fi
+REQUIRED_PACKAGES+=(${tf_ver})
 
 if [ -f tensorflow/bin/activate  ]; then
     source tensorflow/bin/activate
@@ -75,23 +92,32 @@ if [[ ${IS_INSTALLED} -eq 0 ]]; then
     # Get tensorflow (CPU Version) 
     python3 -m venv tensorflow 
     source tensorflow/bin/activate 
-    pip install --upgrade pip 
-    pip install --upgrade ${tf_ver}
-    pip install opencv-python
-    pip install pyyaml h5py  # Required to save models in HDF5 format
-    pip install botocore 
-    pip install boto3
-    pip install matplotlib
+    VIRTUAL_ENVIROMENT_ESTABLISHED=$?
     
-    # Verify installation 
-    check_tf_installed
-
-    if [[ ${IS_INSTALLED} -gt 0 ]]; then
-        echo "Installation Successful"
-    else
-        echo "Installation unsuccessful"
+    if [[ ${VIRTUAL_ENVIROMENT_ESTABLISHED} -ne 0 ]]; then
+        echo "${0}: Error: Installation unsuccessful"
         exit 1
     fi
+fi
+
+# Download the PIP packages required by scripts 
+for t in ${REQUIRED_PACKAGES[@]}; do
+    pip install --upgrade ${t} 
+    PIP_SUCCESS=$?
+    if [ ${PIP_SUCCESS} -ne 0 ]; then 
+        >&2 printf "${0}: Error: pip package %s installation unsuccessful.\n" ${t}
+        exit 1
+    fi
+done 
+
+
+# Verify installation 
+check_tf_installed
+if [[ ${IS_INSTALLED} -gt 0 ]]; then
+    echo "${0}: Info: Installation Successful"
+else
+    echo "${0}: Error: Installation unsuccessful"
+    exit 1
 fi
 
 # If the training set is not already downloaded, download it  
