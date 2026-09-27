@@ -36,7 +36,7 @@ PYTHON_ERROR=$?
 if [ ${PYTHON_ERROR} -eq 0 ]; then
     >&2 printf "${0}: Query: Training successful, would you like to upload the model? (y/N): "
     read USER_RESPONSE
-    if [ ! "${USER_RESPONSE}" == "y" ]; then
+    if [ "${USER_RESPONSE}" == "y" ]; then
         ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/upload-file-to-space.py ${LATEST_KERAS_FILE} ${LATEST_KERAS_FILE} 
         PYTHON_ERROR=$?
         if [ ${PYTHON_ERROR} -ne 0 ]; then
