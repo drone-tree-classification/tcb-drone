@@ -85,8 +85,7 @@ def main():
             # label = f"{names[int(cls_idx)]}: {score:.2f}"
 
             # Draw bounding box rectangle
-
-            cv2.rectangle(im_resized, (box.xmin, box.ymin), (box.xmax, box.ymax), (0, 255, 0), 2)
+            cv2.rectangle(im_resized, (int(box['xmin']),int(box['ymin'])), (int(box['xmin']+box['w']), int(box['ymin']+box['h'])), (0, 255, 0), 2)
 
             # Draw label background and text string
 
