@@ -95,6 +95,7 @@ Note: If a randomly generated coordinate does not have available streetview data
 
 # Project Structure 
 
+- scripts/ Contains all shell and python scripts. Symlinks are provided in the root directory for easy execution (e.g. `./initialize-enviroment.sh`).
 - libs/ Contains python modules that are imported by other projects
 - unit_test/ Contains self contained tests on project functions 
 - uml/ contains uml diagrams 
