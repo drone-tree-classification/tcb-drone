@@ -1,1 +1,0 @@
-scripts/decrypt-flight-log.sh

@@ -5,16 +5,6 @@ tcb-drone measures tree health from aerial photographs from drone flyovers of Tu
 This git project implements neural networks and machine learning to identify trees and assess tree health. This project leverages TensorFlow to implement machine learning algorithms to assess tree health based on aerial photographs of trees.
 
 # Setup
-Once this repo is cloned, developers may setup their development enviroment by running
-```
-./initialize-enviroment.sh
-```
-which will install TensorFlow locally in the development sandbox.
-
-If the developer wishes to employ a GPU to accelerate training runtimes, and is on a system that uses an nVidia GPU and has CUDA installed, the developer may setup their development enviroment by running:
-```
-./initialize-enviroment.sh GPU
-```
 
 ## Setup using Docker (Recommended for cross-platform portability)
 To avoid portability issues across different Linux OSs or environments, it is recommended to use Docker.
@@ -95,7 +85,11 @@ Note: If a randomly generated coordinate does not have available streetview data
 
 # Project Structure 
 
-- scripts/ Contains all shell and python scripts. Symlinks are provided in the root directory for easy execution (e.g. `./initialize-enviroment.sh`).
+- scripts/ Contains all shell and python scripts. To execute these scripts easily without prepending `scripts/` to your commands, you can source the environment setup script from the root directory:
+  ```bash
+  source setup-environment.sh
+  ```
+  This adds the `scripts/` folder to your PATH and configures your PYTHONPATH.
 - libs/ Contains python modules that are imported by other projects
 - unit_test/ Contains self contained tests on project functions 
 - uml/ contains uml diagrams 
@@ -127,11 +121,11 @@ A [Trello Board](https://trello.com/b/RLBbTfDf/tcb-drone-survey) is being used
 for project progress and task tracking.
 
 # Labelling Images
-The training data for this project is labelled using the python module [LabelImg](https://pypi.org/project/labelImg/). LabelImg allows three different annotation types; we are using the PASCAL VOC format. ![Example labelled drone image](https://tcb-drone.sfo3.digitaloceanspaces.com/LabellingExample.jpg) Running initialize-environment.sh installs this module. You can run it with
+The training data for this project is labelled using the python module [LabelImg](https://pypi.org/project/labelImg/). LabelImg allows three different annotation types; we are using the PASCAL VOC format. ![Example labelled drone image](https://tcb-drone.sfo3.digitaloceanspaces.com/LabellingExample.jpg) The Docker setup automatically installs this module. You can run it from inside the container by typing:
 ```
-python labelImg.py
+labelImg
 ``` 
-in the tensorflow/lib/python3.12/site-packages/labelImg directory. A known problem exists between Python/PyQt and Python versions 3.10 and above; the QPainter class expects integers to its drawLine function, while the tkinter canvas class tries to give it floats. This issue can be fixed by replacing the lines 
+A known problem exists between Python/PyQt and Python versions 3.10 and above; the QPainter class expects integers to its drawLine function, while the tkinter canvas class tries to give it floats. This issue can be fixed by replacing the lines
 ```
 p.drawLine(self.prev_point.x(), 0, self.prev_point.x(), self.pixmap.height())
 p.drawLine(0, self.prev_point.y(), self.pixmap.width(), self.prev_point.y())

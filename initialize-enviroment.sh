@@ -1,1 +1,0 @@
-scripts/initialize-enviroment.sh

@@ -1,1 +1,0 @@
-scripts/harvest-images.py

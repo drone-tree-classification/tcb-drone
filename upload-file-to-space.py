@@ -1,1 +1,0 @@
-scripts/upload-file-to-space.py

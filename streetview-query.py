@@ -1,1 +1,0 @@
-scripts/streetview-query.py

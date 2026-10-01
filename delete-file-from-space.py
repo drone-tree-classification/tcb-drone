@@ -1,1 +1,0 @@
-scripts/delete-file-from-space.py
