@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
+import sys
+import os
 
 # harvest-images.py takes a path, finds all xml files, for each drone pic in
 # the xml file, return each image path, its bounding box, and type of tree it
 # is annotated as.
 
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 import argparse
 from os import walk
-from libs.parse_annotation import *
+from parse_annotation import *
 
 textFileList = []
 jpgFileList = []
@@ -70,7 +69,7 @@ for image in xyFileList:
 
 if args.visual:
 
-    from libs.plotFuncs import *
+    from plotFuncs import *
 
     num_rows = 5
     num_cols = 5

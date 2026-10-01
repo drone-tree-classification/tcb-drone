@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-
-import tensorflow as tf
 import sys
 import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+import tensorflow as tf
 from os import walk
 import cv2
 import numpy as np
-from libs.parse_annotation import *
+from parse_annotation import *
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 

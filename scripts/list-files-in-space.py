@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+import sys
+import os
 
 # Step 1: Import the all necessary libraries and SDK commands.
-import os
 import boto3
 import botocore
-import sys
 import json
 import datetime
 import argparse

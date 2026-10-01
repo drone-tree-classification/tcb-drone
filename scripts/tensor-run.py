@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+import sys
+import os
 
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from tensorflow.keras.models import Model, load_model
-import sys
-import os
 import cv2
 import numpy as np
 from pathlib import Path

@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+import sys
+import os
 
 import argparse
-import sys
 import numpy as np
 import cv2
 import tensorflow as tf

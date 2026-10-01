@@ -18,9 +18,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Add scripts directory to PATH and root to PYTHONPATH so scripts can be executed easily
+# Add scripts directory to PATH and libs to PYTHONPATH so scripts can be executed easily
 ENV PATH="/app/scripts:${PATH}"
-ENV PYTHONPATH="/app:${PYTHONPATH}"
+ENV PYTHONPATH="/app/libs:${PYTHONPATH}"
 
 # Set the default command to bash for interactive usage
 CMD ["/bin/bash"]

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import sys
+import os
 
 # Script for getting random Tucson, AZ streetview images to tag and train tree detection on
 # Useful docs:
@@ -6,7 +8,6 @@
 # https://developers.google.com/maps/documentation/streetview/request-streetview
 
 import requests
-import os
 import random
 import argparse
 import math

@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
+import sys
+import os
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from tensorflow.keras.models import Model, load_model
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-import os
 import cv2
 import numpy as np
 from pathlib import Path
@@ -134,7 +132,7 @@ else:
 
 if args.visual:
 
-    from libs.plotFuncs import *
+    from plotFuncs import *
 
     num_rows = 5
     num_cols = 3

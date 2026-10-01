@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-
-import os
 import sys
+import os
+
 import argparse
 import xml.etree.ElementTree as ET
 from pathlib import Path
