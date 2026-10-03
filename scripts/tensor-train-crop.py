@@ -1,33 +1,34 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 
 import tensorflow as tf
-import sys
 from os import walk
 import cv2
 import numpy as np
-from libs.parse_annotation import *
+from parse_annotation import *
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 
 print(tf.__version__)
 
 TrainingSetPathList=[
-      "RillitoPark"
-    , "CherryAvePark"
+      "Downloads/RillitoPark"
+    , "Downloads/CherryAvePark"
 ]
 
-checkpoint_path = "TreeIdentifyTensorFlowModelCropped.keras"
-indexRecordNew="classes-cropped.txt.tmp"
+checkpoint_path = "Models/TreeIdentifyTensorFlowModelCropped.keras"
+indexRecordNew="Models/classes-cropped.txt.tmp"
 trainImageHeight=500
 trainImageWidth=500
 
 # classesArray is a list of trees
 classesArray = []
 
-## 1. Produce list of files 
-# Parse the tagged files 
+## 1. Produce list of files
+# Parse the tagged files
 textFileList = []
-jpgFileList = [] 
+jpgFileList = []
 for TrainingSetPath in TrainingSetPathList:
     for (dirpath, dirnames, filenames) in walk(TrainingSetPath):
         for filename in filenames:
@@ -39,20 +40,20 @@ for TrainingSetPath in TrainingSetPathList:
                     jpgFileList.append(TrainingSetPath + "/" + filename)
                 else:
                     print(PROGRAM_NAME + ": Warning: Unidentified extension: " + str(filename[lastPeriod:]) + " found on file path, " + str(filename) + ", continuing.", file=sys.stderr)
-    
+
 #print(str(textFileList))
 #print(str(jpgFileList))
-#sys.exit()    
-   
-# xyFileList contains a dictionary, associating image file with text file 
+#sys.exit()
+
+# xyFileList contains a dictionary, associating image file with text file
 xyFileList = []
-# Open each text file and get the first character before the first space and 
-# put it in the y_train list 
-y_train = [] 
+# Open each text file and get the first character before the first space and
+# put it in the y_train list
+y_train = []
 x_train = []
 
-## 2. Associate images with xml files 
-# For each text file, associate xml with the associated image 
+## 2. Associate images with xml files
+# For each text file, associate xml with the associated image
 for x in textFileList:
     xLastPeriod=x.rfind('.')
     for y in jpgFileList:
@@ -73,11 +74,11 @@ treeList = []
 ## 3. Parse XML
 # Fetch the first value from the input file,
 # x is a dictionary of 'image' and 'text'
-# This loop parses the input files 
+# This loop parses the input files
 imageCounter = -1
-for x in xyFileList: 
+for x in xyFileList:
     imageCounter = imageCounter + 1
-    xLastPeriod=x["text"].rfind('.')  
+    xLastPeriod=x["text"].rfind('.')
     parseList = []
     # When the tag file associated with the image is an xml file
     if x["text"][xLastPeriod:] == '.xml':
@@ -89,25 +90,25 @@ for x in xyFileList:
         print(PROGRAM_NAME + ": Warning: No parser for extension: " + str(x["text"][xLastPeriod:]) + " for " + str(x["image"]) + " skipping", file=sys.stderr)
         continue
     #x['y_train_index'] = number_int
-    
+
     for i in parseList:
         treeList.append({'xmin': i['xmin'], 'ymin': i['ymin'], 'xmax': i['xmax'], 'ymax': i['ymax'], 'treeID': i['classID'], 'imageID': imageCounter})
     x['parsed'] = True
-                    
+
 
 numTrees=len(treeList)
 numTreeTypes=len(classesArray)
 
 # x_train contains the list of images it is aligned with y_train, which is the
-# list of arrays of indicies into class array. 
+# list of arrays of indicies into class array.
 x_train = np.zeros(shape=(numTrees, trainImageHeight, trainImageWidth, 3), dtype=np.uint8)
 y_train = np.zeros(shape=(numTrees, numTreeTypes))
 ## 4. Produce cropped images and put into x_train, which is the list of images
 imageCounter = 0
 for i in treeList:
-    im = cv2.imread(xyFileList[i['imageID']]['image'], cv2.COLOR_BGR2RGB) 
-    cropped_image = im[i['ymin']:i['ymax'], i['xmin']:i['xmax']] 
-    resized_image = cv2.resize(cropped_image, (trainImageHeight, trainImageWidth)) 
+    im = cv2.imread(xyFileList[i['imageID']]['image'], cv2.COLOR_BGR2RGB)
+    cropped_image = im[i['ymin']:i['ymax'], i['xmin']:i['xmax']]
+    resized_image = cv2.resize(cropped_image, (trainImageHeight, trainImageWidth))
     x_train[imageCounter] = resized_image
     a = [0.0] * len(classesArray)
     y_train[imageCounter][i['treeID']] = 1.0
@@ -115,10 +116,10 @@ for i in treeList:
 
 # Build a machine learning model
 # Sequential is useful for stacking layers where each layer has one input
-# tensor and one output tensor. Layers are functions with a known mathmatical 
-# structure that can be reused and have trainable variables. Most TensorFlow 
+# tensor and one output tensor. Layers are functions with a known mathmatical
+# structure that can be reused and have trainable variables. Most TensorFlow
 # models are composed of layers. This model uses the Flatten, Dense, and Dropout
-# layers. 
+# layers.
 model = tf.keras.models.Sequential([
   tf.keras.layers.Conv2D(
     32,
@@ -139,8 +140,8 @@ model = tf.keras.models.Sequential([
 
 print(str(model.summary()))
 
-# For each example, the model returns a vector of logits or log-odds scores, 
-# one for each class. 
+# For each example, the model returns a vector of logits or log-odds scores,
+# one for each class.
 predictions = model(x_train[:1]).numpy()
 predictions
 
@@ -162,7 +163,7 @@ model.compile(optimizer='adam',
               loss=loss_fn,
               metrics=['accuracy'])
 
-     
+
 # Use the Model.fit method to adjust your model parameters and minimize the loss:
 model.fit(x_train, y_train, epochs=5)
 
@@ -198,7 +199,7 @@ try:
         except OSError as e:
             print(PROGRAM_NAME + ": Error: writing to file: " + str(e), file=sys.stderr)
             sys.exit(1)
-    
+
 except FileNotFoundError as e:
     print(PROGRAM_NAME + ": Error: writing to file: " + str(e), file=sys.stderr)
     sys.exit(1)
@@ -208,4 +209,3 @@ except PermissionError as e:
 except OSError as e:
     print(PROGRAM_NAME + ": Error: writing to file: " + str(e), file=sys.stderr)
     sys.exit(1)
-           
