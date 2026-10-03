@@ -1,4 +1,6 @@
 tensorflow/
+Models/
+Downloads/
 FlightRecordParsingLib/
 Labels
 *.h5

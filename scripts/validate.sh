@@ -30,7 +30,10 @@ if [ ${HAS_PYTHON} -eq 0 ]; then
     exit 1
 fi
 
-if [ ! -f ${LATEST_KERAS_FILE} ]; then
+MODELS_DIR="${SCRIPT_DIR}/../Models"
+DOWNLOADS_DIR="${SCRIPT_DIR}/../Downloads"
+
+if [ ! -f "${MODELS_DIR}/${LATEST_KERAS_FILE}" ]; then
     ${SCRIPT_DIR}/download-file-from-space.sh ${LATEST_KERAS_FILE}
     ERROR=$?
 
@@ -40,7 +43,7 @@ if [ ! -f ${LATEST_KERAS_FILE} ]; then
     fi
 fi
 
-if [ ! -f ${LATEST_CLASSES_FILE} ]; then
+if [ ! -f "${MODELS_DIR}/${LATEST_CLASSES_FILE}" ]; then
     ${SCRIPT_DIR}/download-file-from-space.sh ${LATEST_CLASSES_FILE}
     ERROR=$?
 
@@ -52,14 +55,14 @@ fi
 
 # Make the symbolic link from the normally named keras file to the new
 # keras file
-ln -sf ${LATEST_KERAS_FILE} ${KERAS_FILE}
-ln -sf ${LATEST_CLASSES_FILE} ${CLASSES_FILE}
+ln -sf "${MODELS_DIR}/${LATEST_KERAS_FILE}" "${MODELS_DIR}/${KERAS_FILE}"
+ln -sf "${MODELS_DIR}/${LATEST_CLASSES_FILE}" "${MODELS_DIR}/${CLASSES_FILE}"
 
 # Download the validation set if the file does not exist
 for i in "${VALIDATION_SET[@]}"
 do
     DIRNAME=$(basename -s .tar.gz ${i})
-    if [ ! -d "${DIRNAME}" ]; then
+    if [ ! -d "${DOWNLOADS_DIR}/${DIRNAME}" ]; then
         # Download the file and untar it
         ${SCRIPT_DIR}/download-file-from-space.sh ${i}
         ERROR=$?
@@ -69,7 +72,7 @@ do
             exit 1
         fi
 
-        tar -xzvf ${i}
+        tar -xzvf "${DOWNLOADS_DIR}/${i}" -C "${DOWNLOADS_DIR}"
     fi
 done
 
@@ -78,7 +81,7 @@ ACCUMULATED_DIRS=""
 for i in "${VALIDATION_SET[@]}"
 do
     DIRNAME=$(basename -s .tar.gz ${i})
-    ACCUMULATED_DIRS="${ACCUMULATED_DIRS} ${DIRNAME}"
+    ACCUMULATED_DIRS="${ACCUMULATED_DIRS} ${DOWNLOADS_DIR}/${DIRNAME}"
 done
 
-time ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/harvest-images.py ${ACCUMULATED_DIRS} | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/tensor-run-crop.py | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/count-matches.py ${CLASSES_FILE}
+time ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/harvest-images.py ${ACCUMULATED_DIRS} | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/tensor-run-crop.py | ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/count-matches.py "${MODELS_DIR}/${CLASSES_FILE}"

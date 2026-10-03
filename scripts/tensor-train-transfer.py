@@ -194,7 +194,7 @@ def build_grid_model(img_size=512):
 def main():
     parser = argparse.ArgumentParser(description='Refactored Grid-Based ResNet Tree Detector')
     parser.add_argument('-d', '--datasets', nargs='+', required=True, help='Paths to dataset folders')
-    parser.add_argument('-o', '--output', default='FineTunedResNetOD.keras', help='Output model path')
+    parser.add_argument('-o', '--output', default='Models/FineTunedResNetOD.keras', help='Output model path')
     parser.add_argument('-e', '--epochs', type=int, default=15, help='Training epochs')
     parser.add_argument('-b', '--batch_size', type=int, default=8, help='Batch size')
     args = parser.parse_args()

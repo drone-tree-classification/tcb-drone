@@ -15,7 +15,7 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description='Run Grid-Based ResNet Tree Detector on an image')
     parser.add_argument('image', help='Path to the input image')
-    parser.add_argument('-m', '--model', default='FineTunedResNetOD.keras', help='Path to the trained model')
+    parser.add_argument('-m', '--model', default='Models/FineTunedResNetOD.keras', help='Path to the trained model')
     parser.add_argument('-t', '--threshold', type=float, default=0.5, help='Confidence threshold for bounding boxes')
     parser.add_argument('-o', '--output', help='Optional path to save the output image')
     args = parser.parse_args()

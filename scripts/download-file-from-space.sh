@@ -34,8 +34,14 @@ then
     FORCE=1
 fi
 
+TARGET_DIR="${SCRIPT_DIR}/../Downloads"
+if [[ "$1" == *.keras ]] || [[ "$1" == *.tmp ]]; then
+    TARGET_DIR="${SCRIPT_DIR}/../Models"
+fi
+TARGET_FILE="${TARGET_DIR}/${1}"
+
 # If the file exists and the force flag is not set, ask the user if they want to continue download
-if [ -f $1 ] && [ ${FORCE} -eq 0 ]
+if [ -f "${TARGET_FILE}" ] && [ ${FORCE} -eq 0 ]
 then
    >&2 printf "${0}: Query: File exists, continue? (y/N): "
    read USER_RESPONSE
@@ -46,8 +52,11 @@ if [ ! "${USER_RESPONSE}" == "y" ]; then
     exit 0
 fi
 
+# Ensure target directory exists
+mkdir -p "$(dirname ${TARGET_FILE})"
+
 # Attempt to download the file
-wget ${URL_PREFIX}${1} 2> /dev/null
+wget -O "${TARGET_FILE}" ${URL_PREFIX}${1} 2> /dev/null
 
 ERROR=$?
 
@@ -89,10 +98,17 @@ if [ ${ERROR} -eq 8 ]; then
         names=$(echo "$names" | grep "${thestring}")
         i=1;
         while read n; do
-          mkdir -p $(dirname ${n})
-          if [ -f ${n} ] && [ ${FORCE} -eq 0 ]
+          # Determine inner target file for each item in the directory
+          INNER_TARGET_DIR="${SCRIPT_DIR}/../Downloads"
+          if [[ "${n}" == *.keras ]] || [[ "${n}" == *.tmp ]]; then
+              INNER_TARGET_DIR="${SCRIPT_DIR}/../Models"
+          fi
+          INNER_TARGET_FILE="${INNER_TARGET_DIR}/${n}"
+          mkdir -p "$(dirname ${INNER_TARGET_FILE})"
+
+          if [ -f "${INNER_TARGET_FILE}" ] && [ ${FORCE} -eq 0 ]
           then
-             >&2 printf "${0}: Warning: ${n} exists, skipping. Use -f to overwrite\n"
+             >&2 printf "${0}: Warning: ${n} exists in target directory, skipping. Use -f to overwrite\n"
              read USER_RESPONSE
              if [ ! "${USER_RESPONSE}" == "y" ]; then
                  i=$(($i+1));
@@ -100,15 +116,13 @@ if [ ${ERROR} -eq 8 ]; then
              fi
           fi
           >&2 printf "${0}: Info: Downloading %s: %s\n" "${URL_PREFIX}${n}"
-          wget ${URL_PREFIX}${n}
+          wget -O "${INNER_TARGET_FILE}" ${URL_PREFIX}${n}
           if [ $? -ne 0 ]; then
             if [ ${HAS_PERROR} -gt 0 ]; then
               >&2 printf "${0}: Error: Could not download %s: %s\n" "${n}" "`perror ${ERROR}`"
             else
               >&2 printf "${0}: Error: Could not download %s: error code: %d\n" "${n}" ${ERROR}
             fi
-          else
-            mv `basename ${n}`  `dirname ${n}`
           fi
           i=$(($i+1));
         done <<< "$names"

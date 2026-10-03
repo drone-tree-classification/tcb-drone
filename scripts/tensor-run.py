@@ -52,12 +52,12 @@ def runModel(model, inputImage):
         print(PROGRAM_NAME + ": warning: Could not find image: \'" + str(inputImage) + "\'", file=sys.stderr)
 
 TrainingSetPath="Labels"
-indexRecord="classes.txt.tmp"
+indexRecord="Models/classes.txt.tmp"
 
 resize_width=1000
 resize_height=562
 maxNum = 3
-checkpoint_path = "TreeIdentifyTensorFlowModel.keras"
+checkpoint_path = "Models/TreeIdentifyTensorFlowModel.keras"
 
 def get_model():
     # Create a simple model.
