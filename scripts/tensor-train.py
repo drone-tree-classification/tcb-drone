@@ -17,13 +17,12 @@ print(tf.__version__)
 # DJI_0022.JPG files
 
 TrainingSetPathList=[
-    "Downloads/Parker"
-    , "Downloads/RillitoPark"
+      "Downloads/RillitoPark"
     , "Downloads/CherryAvePark"
 ]
 
 checkpoint_path = "Models/TreeIdentifyTensorFlowModel.keras"
-indexRecord="Downloads/Parker/classes.txt"
+indexRecord="Downloads/RillitoPark/classes.txt"
 indexRecordNew="Models/classes.txt.tmp"
 
 # Amount to scale input images by per axis

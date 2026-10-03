@@ -14,7 +14,7 @@ export PATH="${SCRIPT_DIR}/scripts:${PATH}"
 # Add the libs directory to PYTHONPATH so scripts can resolve the modules
 export PYTHONPATH="${SCRIPT_DIR}/libs:${PYTHONPATH}"
 
-TRAINING_SET=("Parker.tar.gz" "RillitoPark" "CherryPark")
+TRAINING_SET=("RillitoPark" "CherryPark")
 DOWNLOADS_DIR="${SCRIPT_DIR}/Downloads"
 
 for t in "${TRAINING_SET[@]}"; do
