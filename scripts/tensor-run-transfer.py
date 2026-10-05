@@ -1,7 +1,8 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 
 import argparse
-import sys
 import numpy as np
 import cv2
 import tensorflow as tf
@@ -14,7 +15,7 @@ from pathlib import Path
 def main():
     parser = argparse.ArgumentParser(description='Run Grid-Based ResNet Tree Detector on an image')
     parser.add_argument('image', help='Path to the input image')
-    parser.add_argument('-m', '--model', default='FineTunedResNetOD.keras', help='Path to the trained model')
+    parser.add_argument('-m', '--model', default='Models/FineTunedResNetOD.keras', help='Path to the trained model')
     parser.add_argument('-t', '--threshold', type=float, default=0.5, help='Confidence threshold for bounding boxes')
     parser.add_argument('-o', '--output', help='Optional path to save the output image')
     args = parser.parse_args()
@@ -46,7 +47,7 @@ def main():
     im_batch = np.expand_dims(im_processed, axis=0)
 
     print("Running inference...")
-    pred = model.predict(im_batch, verbose=0)[0] 
+    pred = model.predict(im_batch, verbose=0)[0]
 
     boxes = []
     for gy in range(GRID_SIZE):
@@ -88,7 +89,7 @@ def main():
 
     plt.axis('off')
     plt.title(f"Detections (threshold={args.threshold})")
-    
+
     if args.output:
         plt.savefig(args.output, bbox_inches='tight')
         print(f"Saved output to {args.output}")
@@ -97,4 +98,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

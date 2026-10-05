@@ -1,0 +1,8 @@
+tensorflow[and-cuda]
+opencv-python
+pyyaml
+h5py
+botocore
+boto3
+labelImg
+matplotlib

@@ -1,10 +1,10 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from tensorflow.keras.models import Model, load_model
-import sys
-import os 
 import cv2
 import numpy as np
 from pathlib import Path
@@ -16,13 +16,13 @@ def runModel(model, inputImage):
     file_path = Path(inputImage)
 
     if file_path.exists():
-        # Load in the image from inputs from stdin 
-        im = cv2.imread(inputImage, cv2.COLOR_BGR2RGB) 
+        # Load in the image from inputs from stdin
+        im = cv2.imread(inputImage, cv2.COLOR_BGR2RGB)
 
-        # We want to set the input image to the size of the images the network was 
-        # trained on 
+        # We want to set the input image to the size of the images the network was
+        # trained on
         dsize=(resize_width, resize_height)
-        im = cv2.resize(im, dsize) 
+        im = cv2.resize(im, dsize)
 
         print(PROGRAM_NAME + ": info: It takes a long time to load the model...", file=sys.stderr)
 
@@ -52,12 +52,12 @@ def runModel(model, inputImage):
         print(PROGRAM_NAME + ": warning: Could not find image: \'" + str(inputImage) + "\'", file=sys.stderr)
 
 TrainingSetPath="Labels"
-indexRecord="classes.txt.tmp"
+indexRecord="Models/classes.txt.tmp"
 
 resize_width=1000
 resize_height=562
 maxNum = 3
-checkpoint_path = "TreeIdentifyTensorFlowModel.keras"
+checkpoint_path = "Models/TreeIdentifyTensorFlowModel.keras"
 
 def get_model():
     # Create a simple model.
@@ -111,5 +111,3 @@ else:
     inputImages = sys.argv[1:]
     for inputImage in inputImages:
         runModel(model, inputImage)
-
-        

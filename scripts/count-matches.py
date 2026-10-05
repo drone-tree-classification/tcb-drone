@@ -1,6 +1,7 @@
-#!./tensorflow/bin/python
-
+#!/usr/bin/env python3
 import sys
+import os
+
 import re
 
 if len(sys.argv) < 2:

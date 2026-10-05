@@ -1,10 +1,10 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 
 # Step 1: Import the all necessary libraries and SDK commands.
-import os
 import boto3
 import botocore
-import sys
 import json
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
@@ -31,58 +31,58 @@ with open("password.json", "r") as file:
     response = client.list_buckets()
     spaces = [space['Name'] for space in response['Buckets']]
     print(str(spaces))
-    
+
     print(PROGRAM_NAME + " Info: Deleting: " + str(sys.argv[1]), file=sys.stderr)
-    
+
     fileExists = False
-    
-    # Check to see if the file exists 
+
+    # Check to see if the file exists
     response = client.list_objects_v2(
         Bucket='tcb-drone',
         Delimiter=' ',
         EncodingType='url'
     )
-    
+
     fileList = []
     for entry in response['Contents']:
         fileList.append(entry['Key'])
         if entry['Key'] == sys.argv[1]:
             fileExists = True
-    
+
     if fileExists:
         print(PROGRAM_NAME + " Query: Are you sure you want to delete: " + str(sys.argv[1]) + "? (y/N): ", file=sys.stderr, end='')
         shouldDeleteStr = input()
         shouldDelete = shouldDeleteStr.lower() == "y"
-        
+
         if not shouldDelete:
             print(PROGRAM_NAME + " Info: not deleting: " + str(sys.argv[1]), file=sys.stderr)
             sys.exit(0)
     else:
         print(PROGRAM_NAME + " Error: File Not Found: " + str(sys.argv[1]), file=sys.stderr)
         sys.exit(1)
-    
-    # delete the desired file 
-    
+
+    # delete the desired file
+
     # Step 3: Call the delete_object command and specify the file to delete.
     response = client.delete_object(
         Bucket='tcb-drone',
         Key=sys.argv[1])
-        
-    # Get the list of files 
-    
+
+    # Get the list of files
+
     response = client.list_objects_v2(
         Bucket='tcb-drone',
         Delimiter=' ',
         EncodingType='url'
     )
-    
+
     fileList = []
     for entry in response['Contents']:
         fileList.append(entry['Key'])
-    
-    # Create an HTML file to list the files 
-    
-    try:             
+
+    # Create an HTML file to list the files
+
+    try:
         with open("index.html", "w") as f:
             try:
                 f.write("<!DOCTYPE html>")
@@ -109,9 +109,8 @@ with open("password.json", "r") as file:
     except OSError as e:
         print(PROGRAM_NAME + ": Error: opening file: " + str(e), file=sys.stderr)
         sys.exit(1)
-        
-    # Upload the updated html file 
-    
+
+    # Upload the updated html file
+
     client.upload_file(str("index.html"), 'tcb-drone', str("index.html"), ExtraArgs={'ACL':'public-read'})
     sys.exit(0)
-

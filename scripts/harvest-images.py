@@ -1,16 +1,17 @@
-#!./tensorflow/bin/python
-
-# harvest-images.py takes a path, finds all xml files, for each drone pic in 
-# the xml file, return each image path, its bounding box, and type of tree it 
-# is annotated as. 
-
+#!/usr/bin/env python3
 import sys
+import os
+
+# harvest-images.py takes a path, finds all xml files, for each drone pic in
+# the xml file, return each image path, its bounding box, and type of tree it
+# is annotated as.
+
 import argparse
 from os import walk
-from libs.parse_annotation import *
+from parse_annotation import *
 
 textFileList = []
-jpgFileList = [] 
+jpgFileList = []
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 
@@ -34,15 +35,15 @@ for validationPath in args.paths:
                     jpgFileList.append(validationPath + "/" + filename)
                 else:
                     print(PROGRAM_NAME + ": Warning: Unidentified extension: " + str(filename[lastPeriod:]) + " found on file path, " + str(filename) + ", continuing.", file=sys.stderr)
-        
-# xyFileList contains a dictionary, associating image file with text file 
+
+# xyFileList contains a dictionary, associating image file with text file
 xyFileList = []
-# Open each text file and get the first character before the first space and 
-# put it in the y_train list 
-y_train = [] 
+# Open each text file and get the first character before the first space and
+# put it in the y_train list
+y_train = []
 x_train = []
 
-# For each text file, associate xml with the associated image 
+# For each text file, associate xml with the associated image
 for x in textFileList:
     xLastPeriod=x.rfind('.')
     for y in jpgFileList:
@@ -60,16 +61,16 @@ for image in xyFileList:
     if success:
         for tree in returnList:
             print(image['image'] + " " + str(tree['xmin']) + " " + str(tree['ymin']) + " " + str(tree['xmax'] - tree['xmin']) + " " + str(tree['ymax'] - tree['ymin']) + " " + tree['name'])
-            im = cv2.imread(image['image'], cv2.COLOR_BGR2RGB) [tree['ymin']:tree['ymax'], tree['xmin']:tree['xmax']] 
-            im = cv2.resize(im, (500, 500)) 
+            im = cv2.imread(image['image'], cv2.COLOR_BGR2RGB) [tree['ymin']:tree['ymax'], tree['xmin']:tree['xmax']]
+            im = cv2.resize(im, (500, 500))
             test_images.append(im)
             test_labels.append( tree['name'])
 
 
 if args.visual:
 
-    from libs.plotFuncs import *
-    
+    from plotFuncs import *
+
     num_rows = 5
     num_cols = 5
     num_images = num_rows*num_cols

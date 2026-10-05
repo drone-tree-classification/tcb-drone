@@ -1,9 +1,9 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Conv2D, Dense, Flatten, Dropout, MaxPooling2D, BatchNormalization
 from tensorflow.keras.models import Model, load_model
-import sys
-import os 
 import cv2
 import numpy as np
 from pathlib import Path
@@ -13,7 +13,7 @@ PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 
 trainImageHeight=500
 trainImageWidth=500
-indexRecord="classes-cropped.txt.tmp"
+indexRecord="Models/classes-cropped.txt.tmp"
 classesArray = []
 
 test_labels = []
@@ -22,31 +22,31 @@ predictions = []
 
 def runModel(model, inputLine, verbose=0):
     splitline = inputLine.split()
-    
+
     inputImage = splitline[0]
     x=int(0)
     width=int(0)
     y=int(0)
     height=int(0)
-    
+
     if len(splitline) >= 5:
         x=int(splitline[1])
         y=int(splitline[2])
         width=int(splitline[3])
         height=int(splitline[4])
-    
+
     file_path = Path(inputImage)
 
     if file_path.exists():
-        # Load in the image from inputs from stdin 
-        im = cv2.imread(inputImage, cv2.COLOR_BGR2RGB) 
+        # Load in the image from inputs from stdin
+        im = cv2.imread(inputImage, cv2.COLOR_BGR2RGB)
 
         if width > 0 and height > 0:
-            im = im[y:(y+height), x:(x+width)] 
-        im = cv2.resize(im, (trainImageHeight, trainImageWidth)) 
+            im = im[y:(y+height), x:(x+width)]
+        im = cv2.resize(im, (trainImageHeight, trainImageWidth))
         test_images.append(im)
         test_labels.append(str(splitline[5]).replace('\n',''))
-    
+
         image_in_array = np.vstack([[im]])
 
         # Evaluate the model
@@ -63,8 +63,8 @@ def runModel(model, inputLine, verbose=0):
                 indexOfHighestValue = index
                 highestValue = probability
             index = index + 1
-        
-        if verbose > 0: 
+
+        if verbose > 0:
             print(PROGRAM_NAME + ": info: indexOfHighestValue: " + str(indexOfHighestValue), file=sys.stderr)
             print(PROGRAM_NAME + ": info: size of classesArray: " + str(len(classesArray)), file=sys.stderr)
         if indexOfHighestValue >= 0:
@@ -78,7 +78,7 @@ def runModel(model, inputLine, verbose=0):
             print("Could not identify tree, ", end='')
     else:
         print(PROGRAM_NAME + ": warning: Could not find image: \'" + str(inputImage) + "\'", file=sys.stderr)
-        
+
     return 0
 
 parser = argparse.ArgumentParser()
@@ -88,7 +88,7 @@ parser.add_argument('--visual', action='store_true', help='Enable visualization 
 args = parser.parse_args()
 
 TrainingSetPath="Labels"
-checkpoint_path = "TreeIdentifyTensorFlowModelCropped.keras"
+checkpoint_path = "Models/TreeIdentifyTensorFlowModelCropped.keras"
 
 print(PROGRAM_NAME + ": info: version: " + tf.__version__, file=sys.stderr)
 
@@ -124,15 +124,15 @@ if len(args.filenames) == 0:
         line = sys.stdin.readline()
         if not line: break
         runModel(model, line, args.verbose)
-        
-# If positional arguments are provided 
+
+# If positional arguments are provided
 else:
     for inputImage in args.filenames:
         runModel(model, inputImage, args.verbose)
 
 if args.visual:
 
-    from libs.plotFuncs import *
+    from plotFuncs import *
 
     num_rows = 5
     num_cols = 3
@@ -153,5 +153,3 @@ if args.visual:
         i+=1
     plt.tight_layout()
     plt.show()
-
-        
