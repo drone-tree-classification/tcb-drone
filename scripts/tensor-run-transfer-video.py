@@ -1,5 +1,8 @@
 #!./tensorflow/bin/python
 
+# tensor-run-transfer-video.py does live video object localization from a
+# video. 
+
 import argparse
 import sys
 import numpy as np

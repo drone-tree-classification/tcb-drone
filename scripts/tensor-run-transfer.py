@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# tensor-run-transfer.py plots where trees are on an image  
+
 import sys
 import os
 
