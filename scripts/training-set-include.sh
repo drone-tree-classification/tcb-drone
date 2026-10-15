@@ -24,10 +24,24 @@ declare -a TRAINING_SET_DIR_NAMES=(
                            "RillitoPark"
                 )
 
+# download_training_set downloads the full training set
+# @param PARENT_SCRIPT_NAME  name of calling script, used for error reporting, 
+#  can be any string. 
+# @param SCRIPT_DIR_DOWNLOAD  path to scripts directory.
+# @param DOWNLOAD_DIR  directory to download to.
+#
 download_training_set() {
-    SCRIPT_DIR_DOWNLOAD=$1
+    PARENT_SCRIPT_NAME=$1
+    SCRIPT_DIR_DOWNLOAD=$2
+    DOWNLOAD_DIR=$3
+    
+    if [ $# -ne 3 ]; then
+        echo "Usage: $0 [parent script name] [script dir] [download dir]"
+        exit 1
+    fi
+    
     TRAINING_SET_STRING=""
-
+    
     # Download the training set if the file does not exist 
     j=0
     for i in "${TRAINING_SET[@]}"
@@ -35,17 +49,31 @@ download_training_set() {
         DIRNAME=${TRAINING_SET_DIR_NAMES[$j]}
         TRAINING_SET_STRING="${TRAINING_SET_STRING} ${DIRNAME}"
         if [ ! -d "${DIRNAME}" ]; then
-            >&2 printf "${0}: Info: Downloading %s ...\n" ${i}
+            >&2 printf "%s: Info: Downloading %s ...\n" ${PARENT_SCRIPT_NAME} ${i}
             # Download the file and untar it 
             ${SCRIPT_DIR_DOWNLOAD}/download-file-from-space.sh ${i}
             ERROR=$?
 
             if [ ${ERROR} -ne 0 ]; then 
-                >&2 printf "${0}: Error: Could not download file: %s\n" ${i}
-                exit 1
+                >&2 printf "%s: Warning: Could not download file: %s\n" ${PARENT_SCRIPT_NAME} ${i}
+                continue
             fi
-        
-            tar -xzvf ${i}
+            
+            mv ${i} ${DOWNLOAD_DIR}
+            ERROR=$?
+
+            if [ ${ERROR} -ne 0 ]; then 
+                >&2 printf "%s: Warning: Could not move file to: %s\n" ${PARENT_SCRIPT_NAME} ${DOWNLOAD_DIR}
+                continue
+            fi
+            
+            tar -xzvf ${DOWNLOAD_DIR}"/"${i}
+            
+            ERROR=$?
+            if [ ${ERROR} -ne 0 ]; then 
+                >&2 printf "%s: Warning: Could not untar file: %s\n" ${PARENT_SCRIPT_NAME} ${DOWNLOAD_DIR}"/"${i}
+                continue
+            fi
         fi
         j=$((j += 1))
     done

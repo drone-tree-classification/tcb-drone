@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  tcb-drone:
+    build: .
+    volumes:
+      - .:/app
+    # Uncomment the following lines to enable GPU support if you have nvidia-docker installed
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    environment:
+      - PYTHONUNBUFFERED=1
+    stdin_open: true
+    tty: true
+    command: /bin/bash
