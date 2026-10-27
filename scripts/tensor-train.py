@@ -1,29 +1,29 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 
 import tensorflow as tf
-import sys
 from os import walk
 import cv2
 import numpy as np
-from libs.parse_annotation import *
+from parse_annotation import *
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
 
 print(tf.__version__)
 
-# Load the dataset, look in the 'Lables' directory and find the 
-# DJI_0022.txt files and correlate them with the 
+# Load the dataset, look in the 'Lables' directory and find the
+# DJI_0022.txt files and correlate them with the
 # DJI_0022.JPG files
 
 TrainingSetPathList=[
-    "Parker"
-    , "RillitoPark"
-    , "CherryAvePark"
+      "Downloads/RillitoPark"
+    , "Downloads/CherryAvePark"
 ]
 
-checkpoint_path = "TreeIdentifyTensorFlowModel.keras"
-indexRecord="Parker/classes.txt"
-indexRecordNew="classes.txt.tmp"
+checkpoint_path = "Models/TreeIdentifyTensorFlowModel.keras"
+indexRecord="Downloads/RillitoPark/classes.txt"
+indexRecordNew="Models/classes.txt.tmp"
 
 # Amount to scale input images by per axis
 imageScaleFactor=0.25
@@ -46,11 +46,11 @@ except FileNotFoundError:
 except Exception as e:
     print(PROGRAM_NAME + ": Warning: classes file: " + indexRecord + " not found, if tagged with text format, these images will not be used to train., exception: " + str(e), file=sys.stderr)
     classesFileFound = False
-    
+
 initialClassArrayLen = len(classesArray)
 
 textFileList = []
-jpgFileList = [] 
+jpgFileList = []
 for TrainingSetPath in TrainingSetPathList:
     for (dirpath, dirnames, filenames) in walk(TrainingSetPath):
         for filename in filenames:
@@ -63,7 +63,7 @@ for TrainingSetPath in TrainingSetPathList:
                 elif filename[lastPeriod:].lower() == ".jpg":
                     jpgFileList.append(TrainingSetPath + "/" + filename)
 
-# xyFileList contains a dictionary, associating image file with text file 
+# xyFileList contains a dictionary, associating image file with text file
 xyFileList = []
 
 for x in textFileList:
@@ -74,20 +74,20 @@ for x in textFileList:
             xyFileList.append({'image': y, 'text':x, 'parsed': False})
 
 
-# Open each text file and get the first character before the first space and 
-# put it in the y_train list 
-y_train = [] 
+# Open each text file and get the first character before the first space and
+# put it in the y_train list
+y_train = []
 maxNum = 0
 
-# Fetch the first value from the input file 
-for x in xyFileList: 
+# Fetch the first value from the input file
+for x in xyFileList:
     number_str = ""
     xLastPeriod=x["text"].rfind('.')
     # When the tag file associated with the image is a txt file
     if x["text"][xLastPeriod:] == '.txt':
         if not classesFileFound:
             print(PROGRAM_NAME + ": Error: Not training with: " + str(x["image"]) + " because classes file not found.", file=sys.stderr)
-            break 
+            break
         try:
             with open(x["text"], 'r') as f:
                 while True:
@@ -120,21 +120,21 @@ for x in xyFileList:
     if number_int > maxNum:
         maxNum = number_int
 
-# Set the index size for later on 
+# Set the index size for later on
 maxNum = maxNum + 1
 imgHeight = 0
 imgWidth = 0
 
-# Use OpenCV NumPy interface, gotten from: 
+# Use OpenCV NumPy interface, gotten from:
 # https://stackoverflow.com/questions/7762948/how-to-convert-an-rgb-image-to-numpy-array
 for x in xyFileList:
     imageFilePath = x["image"]
     print(PROGRAM_NAME + ": Info: Reading in: " + imageFilePath, file=sys.stderr)
-    im = cv2.imread(imageFilePath, cv2.COLOR_BGR2RGB) 
+    im = cv2.imread(imageFilePath, cv2.COLOR_BGR2RGB)
     # scale image to be 1/16 the size
-    im = cv2.resize(im, (0,0), fx=imageScaleFactor, fy=imageScaleFactor) 
-    
-    # Check to make sure all images are the same size 
+    im = cv2.resize(im, (0,0), fx=imageScaleFactor, fy=imageScaleFactor)
+
+    # Check to make sure all images are the same size
     if imgHeight == 0:
         imgHeight = np.size(im, 0)
         imgWidth = np.size(im, 1)
@@ -145,19 +145,19 @@ for x in xyFileList:
     x["x_train"] = im
     #print(str(x["x_train"]))
 
-    
+
 print("Height: " + str(imgHeight) + " Width: " + str(imgWidth))
 
-# Create the y_train array, it is an array of arrays of floats, the size of 
-# the second array is the number of different trees we're identifying. 
-# Each index represents a probability of it being the designated tree in the 
-# classes.txt file 
-#for x in xyFileList: 
+# Create the y_train array, it is an array of arrays of floats, the size of
+# the second array is the number of different trees we're identifying.
+# Each index represents a probability of it being the designated tree in the
+# classes.txt file
+#for x in xyFileList:
 #    array = np.zeros(maxNum, dtype=float)
 #    array[x['y_train_index']] = 1.0
 #    x["y_train"] = array
 
-# Populate the x train and y train arrays 
+# Populate the x train and y train arrays
 count = 0
 for n in xyFileList:
     if n['parsed']:
@@ -171,7 +171,7 @@ for n in xyFileList[count+1:]:
     if n['parsed']:
         x_train = np.vstack([x_train, [n["x_train"]]])
 
-# Verify dimensions 
+# Verify dimensions
 if y_train.ndim != 1:
     print(PROGRAM_NAME + ": Error: y_train.ndim not 1, it is: " + str(y_train.ndim), file=sys.stderr)
     sys.exit(1)
@@ -185,10 +185,10 @@ if len(y_train) != len(x_train):
 
 # Build a machine learning model
 # Sequential is useful for stacking layers where each layer has one input
-# tensor and one output tensor. Layers are functions with a known mathmatical 
-# structure that can be reused and have trainable variables. Most TensorFlow 
+# tensor and one output tensor. Layers are functions with a known mathmatical
+# structure that can be reused and have trainable variables. Most TensorFlow
 # models are composed of layers. This model uses the Flatten, Dense, and Dropout
-# layers. 
+# layers.
 model = tf.keras.models.Sequential([
   tf.keras.layers.Flatten(input_shape=(imgHeight, imgWidth, 3)),
   tf.keras.layers.Dense(128, activation='relu'),
@@ -198,8 +198,8 @@ model = tf.keras.models.Sequential([
 
 print(str(model.summary()))
 
-# For each example, the model returns a vector of logits or log-odds scores, 
-# one for each class. 
+# For each example, the model returns a vector of logits or log-odds scores,
+# one for each class.
 predictions = model(x_train[:1]).numpy()
 predictions
 
@@ -219,7 +219,7 @@ model.compile(optimizer='adam',
               loss=loss_fn,
               metrics=['accuracy'])
 
-     
+
 # Use the Model.fit method to adjust your model parameters and minimize the loss:
 model.fit(x_train, y_train, epochs=5)
 
@@ -242,7 +242,7 @@ probability_model = tf.keras.Sequential([
 model.save(checkpoint_path)
 
 # Take the classesArray that we have built up and write it out to a temporary file
-try:             
+try:
     with open(indexRecordNew, "w") as f:
         try:
             # save the classes array
@@ -255,10 +255,10 @@ try:
         except OSError as e:
             print(PROGRAM_NAME + ": Error: writing to file: " + str(e), file=sys.stderr)
             sys.exit(1)
-    
+
     if initialClassArrayLen < len(classesArray):
         print(PROGRAM_NAME + ": Info: classes file: " + str(indexRecordNew) + " has new records added to it. As a developer, please integrate and update these changes to: " + str(indexRecord) + " so that when running the model, users can know what trees have been identified by the model based on ID.", file=sys.stderr)
-    
+
 except FileNotFoundError as e:
     print(PROGRAM_NAME + ": Error: writing to file: " + str(e), file=sys.stderr)
     sys.exit(1)
@@ -268,8 +268,3 @@ except PermissionError as e:
 except OSError as e:
     print(PROGRAM_NAME + ": Error: writing to file: " + str(e), file=sys.stderr)
     sys.exit(1)
-
-
-    
-
-
