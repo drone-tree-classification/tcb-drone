@@ -36,7 +36,7 @@ download_training_set() {
     DOWNLOAD_DIR=$3
     
     if [ $# -ne 3 ]; then
-        echo "Usage: $0 [parent script name] [script dir] [download dir]"
+        echo "Error: Usage: $0 [parent script name] [script dir] [download dir]"
         exit 1
     fi
     
@@ -46,12 +46,12 @@ download_training_set() {
     j=0
     for i in "${TRAINING_SET[@]}"
     do
-        DIRNAME=${TRAINING_SET_DIR_NAMES[$j]}
+        DIRNAME=${DOWNLOAD_DIR}"/"${TRAINING_SET_DIR_NAMES[$j]}
         TRAINING_SET_STRING="${TRAINING_SET_STRING} ${DIRNAME}"
         if [ ! -d "${DIRNAME}" ]; then
             >&2 printf "%s: Info: Downloading %s ...\n" ${PARENT_SCRIPT_NAME} ${i}
             # Download the file and untar it 
-            ${SCRIPT_DIR_DOWNLOAD}/download-file-from-space.sh ${i}
+            ${SCRIPT_DIR_DOWNLOAD}/download-file-from-space.sh ${i} -f 
             ERROR=$?
 
             if [ ${ERROR} -ne 0 ]; then 
@@ -59,15 +59,15 @@ download_training_set() {
                 continue
             fi
             
-            mv ${i} ${DOWNLOAD_DIR}
+            mv -f ${i} ${DOWNLOAD_DIR} 
             ERROR=$?
 
-            if [ ${ERROR} -ne 0 ]; then 
-                >&2 printf "%s: Warning: Could not move file to: %s\n" ${PARENT_SCRIPT_NAME} ${DOWNLOAD_DIR}
+            if [ ${ERROR} -ne 0 ] && [ ${ERROR} -ne 1 ]; then 
+                >&2 printf "%s: Warning: Could not move file to: %s, Error: %d\n" ${PARENT_SCRIPT_NAME} ${DOWNLOAD_DIR} ${ERROR}
                 continue
             fi
             
-            tar -xzvf ${DOWNLOAD_DIR}"/"${i}
+            tar -xzvf ${DOWNLOAD_DIR}"/"${i} --directory ${DOWNLOAD_DIR}
             
             ERROR=$?
             if [ ${ERROR} -ne 0 ]; then 
@@ -75,6 +75,23 @@ download_training_set() {
                 continue
             fi
         fi
+        j=$((j += 1))
+    done
+    printf "%s\n" "${TRAINING_SET_STRING}"
+}
+
+print_training_set_path()
+{
+    SCRIPT_DIR_DOWNLOAD=$1
+    
+    TRAINING_SET_STRING=""
+    
+    # Download the training set if the file does not exist 
+    j=0
+    for i in "${TRAINING_SET[@]}"
+    do
+        DIRNAME=${TRAINING_SET_DIR_NAMES[$j]}
+        TRAINING_SET_STRING="${TRAINING_SET_STRING} ${SCRIPT_DIR_DOWNLOAD}"/"${DIRNAME}"
         j=$((j += 1))
     done
     printf "%s\n" "${TRAINING_SET_STRING}"

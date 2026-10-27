@@ -7,8 +7,10 @@
 
 readonly SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # Have to use the python version that is pointed to by the symbolic link, cannot resolve to the base python version
-readonly PYTHON_INTERPRETER=${SCRIPT_DIR}/tensorflow/bin/python
+readonly PYTHON_INTERPRETER=$(which python3)
 readonly HAS_PYTHON=$(ls ${PYTHON_INTERPRETER} 2> /dev/null | wc -l) 
+
+DOWNLOADS_DIR="${SCRIPT_DIR}/../Downloads"
 
 source training-set-include.sh
 
@@ -24,7 +26,11 @@ readonly LATEST_KERAS_FILE=FineTunedResNetOD-${DATE}.keras
 
 USER_RESPONSE='n'
 
-TRAINING_SET_STRING=$(download_training_set "${SCRIPT_DIR}" ) 
+mkdir -p ${DOWNLOADS_DIR}
+
+download_training_set "${SCRIPT_DIR}" "." ${DOWNLOADS_DIR}
+
+TRAINING_SET_STRING=$(print_training_set_path ${DOWNLOADS_DIR} ) 
 
 echo ${TRAINING_SET_STRING}
 
