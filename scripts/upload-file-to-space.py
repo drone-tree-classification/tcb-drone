@@ -1,25 +1,32 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 
 # Step 1: Import the all necessary libraries and SDK commands.
-import os
 import boto3
 import botocore
-import sys
 import json
+from pathlib import Path
 
 PROGRAM_NAME=str(sys.argv[0].lstrip('.').lstrip('/'))
+PASSWORD_FILE="password.json"
+
+my_file = Path(PASSWORD_FILE)
+if not (my_file.exists() and my_file.is_file()):
+    print(PROGRAM_NAME + ": Error: password.json file is required to upload. Please consult the README.md file.", file=sys.stderr)
+    sys.exit(1)
 
 if len(sys.argv) < 2:
     print(PROGRAM_NAME + ": Error: No file provided: Please provide name of file in input.", file=sys.stderr)
     sys.exit(1)
 
 if len(sys.argv) < 3:
-    print(PROGRAM_NAME + "Warning: No destination file name provided. Defaulting to path as file name.", file=sys.stderr)
+    print(PROGRAM_NAME + ": Warning: No destination file name provided. Defaulting to path as file name.", file=sys.stderr)
     answer = input("Do you want to continue with path name?:[y/n] ")
     if (answer != "y" and answer != "Y"):
         sys.exit(1)
-
-with open("password.json", "r") as file:
+    
+with open(PASSWORD_FILE, "r") as file:
     data = json.load(file)
 
     # Step 2: The new session validates your request and directs it to your Space's specified endpoint using the AWS SDK.
@@ -37,32 +44,32 @@ with open("password.json", "r") as file:
     response = client.list_buckets()
     spaces = [space['Name'] for space in response['Buckets']]
     print(str(spaces))
-    
+
     print(PROGRAM_NAME + " Info: Uploading: " + str(sys.argv[1]), file=sys.stderr)
-    
-    # Upload the desired file 
-    
-    # Step 3: Call the put_object command and specify the file to upload. 
+
+    # Upload the desired file
+
+    # Step 3: Call the put_object command and specify the file to upload.
     if len(sys.argv) < 3:
         client.upload_file(str(sys.argv[1]), 'tcb-drone', str(sys.argv[1]), ExtraArgs={'ACL':'public-read'})
     else:
         client.upload_file(str(sys.argv[1]), 'tcb-drone', str(sys.argv[2]), ExtraArgs={'ACL':'public-read'})
-        
-    # Get the list of files 
-    
+
+    # Get the list of files
+
     response = client.list_objects_v2(
         Bucket='tcb-drone',
         Delimiter=' ',
         EncodingType='url'
     )
-    
+
     fileList = []
     for entry in response['Contents']:
         fileList.append(entry['Key'])
-    
-    # Create an HTML file to list the files 
-    
-    try:             
+
+    # Create an HTML file to list the files
+
+    try:
         with open("index.html", "w") as f:
             try:
                 f.write("<!DOCTYPE html>")
@@ -89,9 +96,8 @@ with open("password.json", "r") as file:
     except OSError as e:
         print(PROGRAM_NAME + ": Error: opening file: " + str(e), file=sys.stderr)
         sys.exit(1)
-        
-    # Upload the updated html file 
-    
+
+    # Upload the updated html file
+
     client.upload_file(str("index.html"), 'tcb-drone', str("index.html"), ExtraArgs={'ACL':'public-read'})
     sys.exit(0)
-
