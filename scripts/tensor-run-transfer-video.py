@@ -1,4 +1,4 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
 
 # tensor-run-transfer-video.py does live video object localization from a
 # video. 

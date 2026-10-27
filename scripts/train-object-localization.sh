@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
 
 # train-object-localization is a reproducable training script for the object
 # localization file creation. Executing this file will download the training
