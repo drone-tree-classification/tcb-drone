@@ -1,7 +1,7 @@
-#!./tensorflow/bin/python
-
-import os
+#!/usr/bin/env python3
 import sys
+import os
+
 import argparse
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -153,7 +153,7 @@ def weighted_od_loss(y_true, y_pred):
     # Confidence Loss (Binary Crossentropy)
     bce = tf.keras.losses.BinaryCrossentropy(reduction=tf.keras.losses.Reduction.NONE)
     conf_loss = bce(y_true[..., 0:1], y_pred[..., 0:1])  # Shape becomes (batch, 16, 16)
-    
+
     # FIX: Add the trailing dimension back so it matches the masks
     conf_loss = tf.expand_dims(conf_loss, axis=-1)       # Shape restored to (batch, 16, 16, 1)
 
@@ -163,10 +163,10 @@ def weighted_od_loss(y_true, y_pred):
     # Box Coordinate Loss (Huber Loss, masked to positive object cells only)
     huber = tf.keras.losses.Huber(reduction=tf.keras.losses.Reduction.NONE)
     box_loss = huber(y_true[..., 1:5], y_pred[..., 1:5]) # Shape becomes (batch, 16, 16)
-    
+
     # FIX: Add trailing dimension back
     box_loss = tf.expand_dims(box_loss, axis=-1)         # Shape restored to (batch, 16, 16, 1)
-    
+
     masked_box_loss = box_loss * obj_mask
 
     total_conf = tf.reduce_mean(tf.reduce_sum(weighted_conf_loss, axis=[1, 2, 3]))
@@ -194,7 +194,7 @@ def build_grid_model(img_size=512):
 def main():
     parser = argparse.ArgumentParser(description='Refactored Grid-Based ResNet Tree Detector')
     parser.add_argument('-d', '--datasets', nargs='+', required=True, help='Paths to dataset folders')
-    parser.add_argument('-o', '--output', default='FineTunedResNetOD.keras', help='Output model path')
+    parser.add_argument('-o', '--output', default='Models/FineTunedResNetOD.keras', help='Output model path')
     parser.add_argument('-e', '--epochs', type=int, default=15, help='Training epochs')
     parser.add_argument('-b', '--batch_size', type=int, default=8, help='Batch size')
     args = parser.parse_args()

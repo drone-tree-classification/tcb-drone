@@ -1,10 +1,10 @@
-#!./tensorflow/bin/python
+#!/usr/bin/env python3
+import sys
+import os
 
 # Step 1: Import the all necessary libraries and SDK commands.
-import os
 import boto3
 import botocore
-import sys
 import json
 import datetime
 import argparse
@@ -36,7 +36,7 @@ def human_readable_bytes(nbytes):
     while nbytes >= 1024 and i < len(suffixes) - 1:
         nbytes /= 1024.0
         i += 1
-    
+
     # Format the number to two decimal places, removing trailing zeros and the decimal point if not needed
     formatted_nbytes = f'{nbytes:.2f}'.rstrip('0').rstrip('.')
     return f'{formatted_nbytes} {suffixes[i]}'
@@ -65,15 +65,15 @@ if __name__ == "__main__":
 
             # List all buckets on your account.
             try:
-                # Get the list of files 
+                # Get the list of files
                 response = client.list_objects_v2(
                     Bucket='tcb-drone',
                     Delimiter=' ',
                     EncodingType='url'
                 )
-                
+
                 fileKeyValuePairList = []
-                
+
                 maxlen = 0
                 for entry in response['Contents']:
                     tempStr = str(entry['Key']).replace('%2F', '/')
@@ -85,12 +85,12 @@ if __name__ == "__main__":
                     )
                     if maxlen < len(str(tempStr)):
                         maxlen = len(str(tempStr))
-                
-                # We want to sort with respect to time 
+
+                # We want to sort with respect to time
                 sorted_by_name_desc = sorted(response['Contents'], key=lambda x: x['LastModified'], reverse=False)
-                
-                # https://tcb-drone.sfo3.digitaloceanspaces.com/" + 
-                
+
+                # https://tcb-drone.sfo3.digitaloceanspaces.com/" +
+
                 print("File path:".ljust(maxlen + 1) + " Size:", file=sys.stderr)
                 print("----------".ljust(maxlen + 1) + " -----", file=sys.stderr)
                 for entry in fileKeyValuePairList:
@@ -99,9 +99,9 @@ if __name__ == "__main__":
                             print((str(entry['Key'])).ljust(maxlen + 1))
                         else:
                             print((str(entry['Key'])).ljust(maxlen + 1) + " " + str(human_readable_bytes(entry['Size'])))
-                
+
                 sys.exit(0)
-                
+
             except botocore.exceptions.ClientError as error:
                 print(PROGRAM_NAME + ": Error: " + str(error) + "", file=sys.stderr)
                 sys.exit(2)
@@ -113,4 +113,3 @@ if __name__ == "__main__":
     except FileNotFoundError:
         print(PROGRAM_NAME + ": Error: password.json not found.", file=sys.stderr)
         sys.exit(1)
-    

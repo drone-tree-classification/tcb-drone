@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 if [ $# -ne 2 ]; then
     echo "Usage: $0 [path to encrypted flight log] [path to output file]"
