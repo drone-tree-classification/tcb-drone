@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+# train-object-localization is a reproducable training script for the object
+# localization file creation. Executing this file will download the training
+# set, train the object localization model, create a .keras file, and ask the 
+# user whether they would like to upload the file to the digital ocean bucket. 
+
+readonly SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+# Have to use the python version that is pointed to by the symbolic link, cannot resolve to the base python version
+readonly PYTHON_INTERPRETER=$(which python3)
+readonly HAS_PYTHON=$(ls ${PYTHON_INTERPRETER} 2> /dev/null | wc -l) 
+
+DOWNLOADS_DIR="${SCRIPT_DIR}/../Downloads"
+
+source training-set-include.sh
+
+# Test to see if users computer has python installed 
+if [ ${HAS_PYTHON} -eq 0 ]; then 
+    >&2 printf "${0}: Error: python not found.\n"
+    >&2 printf "${0}: Info: Run ./initialize-enviroment.sh and try again.\n"
+    exit 1
+fi
+
+DATE=$(date '+%Y-%m-%d-%H-%M-%S')
+readonly LATEST_KERAS_FILE=FineTunedResNetOD-${DATE}.keras
+
+USER_RESPONSE='n'
+
+mkdir -p ${DOWNLOADS_DIR}
+
+download_training_set "${SCRIPT_DIR}" "." ${DOWNLOADS_DIR}
+
+TRAINING_SET_STRING=$(print_training_set_path ${DOWNLOADS_DIR} ) 
+
+echo ${TRAINING_SET_STRING}
+
+# Train the model 
+time ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/tensor-train-transfer.py -o ${LATEST_KERAS_FILE} -d ${TRAINING_SET_STRING} 
+PYTHON_ERROR=$?
+
+# If training was successful, ask the user if they would like to upload the .keras file generated from training
+if [ ${PYTHON_ERROR} -eq 0 ]; then
+    >&2 printf "${0}: Query: Training successful, would you like to upload the model? (y/N): "
+    read USER_RESPONSE
+    if [ "${USER_RESPONSE}" == "y" ]; then
+        ${PYTHON_INTERPRETER} ${SCRIPT_DIR}/upload-file-to-space.py ${LATEST_KERAS_FILE} ${LATEST_KERAS_FILE} 
+        PYTHON_ERROR=$?
+        if [ ${PYTHON_ERROR} -ne 0 ]; then
+            >&2 printf "${0}: Error: Unable to upload file, please review log and upload %s manually" ${LATEST_KERAS_FILE}
+        fi
+    else
+        >&2 printf "${0}: Info: User selection was no, please upload %s manually" ${LATEST_KERAS_FILE}
+    fi
+fi
+

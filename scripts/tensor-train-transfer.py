@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+# tensor-train-trasfer.py trains a object localization neural net 
+
 import sys
 import os
 

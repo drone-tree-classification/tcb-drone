@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+
+# harvest-images.py takes a space separated list of paths through command line
+# argument, finds all xml files, for each drone pic in the xml file, and prints,
+# to standard out, each image path, its bounding box, and type of tree it 
+# is annotated as. 
+
 import sys
 import os
 
